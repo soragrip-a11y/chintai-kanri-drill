@@ -1,0 +1,1453 @@
+[
+  {
+    "id": "K001",
+    "category": "登録・業務管理",
+    "topic": "登録義務",
+    "question": "賃貸住宅管理業の登録義務について、正しいものはどれか。",
+    "choices": [
+      {
+        "text": "管理戸数200戸以上の事業者は、原則として国土交通大臣の登録が必要である。",
+        "ok": true
+      },
+      {
+        "text": "管理戸数50戸以上で登録が必要となる。",
+        "ok": false
+      },
+      {
+        "text": "管理戸数100戸以上で登録が必要となる。",
+        "ok": false
+      },
+      {
+        "text": "管理戸数500戸以上になるまで登録は不要である。",
+        "ok": false
+      }
+    ],
+    "explanation": "登録義務の境界は200戸。管理戸数200戸未満なら任意登録ができる。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/administrator_duties.html",
+    "sourceName": "国交省：管理業者の業務",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K002",
+    "category": "登録・業務管理",
+    "topic": "任意登録",
+    "question": "管理戸数150戸の事業者について、正しいものはどれか。",
+    "choices": [
+      {
+        "text": "登録を受けても賃貸住宅管理業法の業者規制を受けない。",
+        "ok": false
+      },
+      {
+        "text": "法律上の登録は原則任意だが、登録を受けることはできる。",
+        "ok": true
+      },
+      {
+        "text": "登録申請自体が禁止される。",
+        "ok": false
+      },
+      {
+        "text": "無条件で登録が義務付けられる。",
+        "ok": false
+      }
+    ],
+    "explanation": "200戸未満は任意登録。ただし登録した業者は該当する法定義務を負う。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/system_commentary.html",
+    "sourceName": "国交省：制度解説",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K003",
+    "category": "登録・業務管理",
+    "topic": "管理業務の定義",
+    "question": "家賃の集金だけを受託し、維持保全を行わない事業について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "金銭管理だけの場合は例外なく宅建免許が必要となる。",
+        "ok": false
+      },
+      {
+        "text": "金銭管理だけでも必ず業務管理者を設置する必要がある。",
+        "ok": false
+      },
+      {
+        "text": "家賃等の金銭管理だけでは、法の「賃貸住宅管理業」に該当しない。",
+        "ok": true
+      },
+      {
+        "text": "金銭管理だけで当然に管理業登録が必要となる。",
+        "ok": false
+      }
+    ],
+    "explanation": "法の対象となる管理業務は、維持保全単独、または維持保全と金銭管理の併用。金銭管理のみは対象外。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/administrator_duties.html",
+    "sourceName": "国交省：管理業者の業務",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K004",
+    "category": "登録・業務管理",
+    "topic": "登録先",
+    "question": "賃貸住宅管理業の法定登録先として正しいものはどれか。",
+    "choices": [
+      {
+        "text": "国土交通大臣。",
+        "ok": true
+      },
+      {
+        "text": "都道府県知事。",
+        "ok": false
+      },
+      {
+        "text": "市区町村長。",
+        "ok": false
+      },
+      {
+        "text": "宅地建物取引業保証協会。",
+        "ok": false
+      }
+    ],
+    "explanation": "賃貸住宅管理業の法定登録は国土交通大臣に対して行う。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/const/tochi_fudousan_kensetsugyo_const_tk3_000001_00012.html",
+    "sourceName": "国交省：登録申請",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K005",
+    "category": "登録・業務管理",
+    "topic": "登録期間",
+    "question": "賃貸住宅管理業の登録の有効期間について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "登録後は無期限である。",
+        "ok": false
+      },
+      {
+        "text": "5年間である。",
+        "ok": true
+      },
+      {
+        "text": "1年間である。",
+        "ok": false
+      },
+      {
+        "text": "3年間である。",
+        "ok": false
+      }
+    ],
+    "explanation": "登録は5年間有効。継続する場合は所定の期間内に更新申請する。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/const/tochi_fudousan_kensetsugyo_const_tk3_000001_00012.html",
+    "sourceName": "国交省：登録申請",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K006",
+    "category": "登録・業務管理",
+    "topic": "更新申請",
+    "question": "登録の更新申請時期について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "満了日の180日前から150日前までに申請する。",
+        "ok": false
+      },
+      {
+        "text": "満了後30日以内であれば必ず適法に更新できる。",
+        "ok": false
+      },
+      {
+        "text": "有効期間満了日の90日前から30日前までに申請する。",
+        "ok": true
+      },
+      {
+        "text": "満了日の前日だけに申請する。",
+        "ok": false
+      }
+    ],
+    "explanation": "更新申請は満了日の90日前から30日前まで。",
+    "source": "https://www.ktr.mlit.go.jp/kensan/index00000029.html",
+    "sourceName": "国交省関東地方整備局：FAQ",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K007",
+    "category": "登録・業務管理",
+    "topic": "宅建免許との関係",
+    "question": "賃貸住宅管理業の登録と宅建業免許との関係で正しいものはどれか。",
+    "choices": [
+      {
+        "text": "宅建業免許がなければ登録申請できない。",
+        "ok": false
+      },
+      {
+        "text": "宅建業免許を持つだけで管理業の登録も自動付与される。",
+        "ok": false
+      },
+      {
+        "text": "宅建業免許を返納すると管理業登録も必ず同時に消滅する。",
+        "ok": false
+      },
+      {
+        "text": "宅建業免許を持っていなくても、要件を満たせば登録を受けられる。",
+        "ok": true
+      }
+    ],
+    "explanation": "賃貸住宅管理業の登録に宅建業免許の保有は必須ではない。",
+    "source": "https://www.ktr.mlit.go.jp/kensan/index00000029.html",
+    "sourceName": "国交省関東地方整備局：FAQ",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K008",
+    "category": "登録・業務管理",
+    "topic": "業務開始",
+    "question": "登録後の事業開始について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "登録後1年以内に業務を始めないと、登録取消しの対象となる。",
+        "ok": true
+      },
+      {
+        "text": "登録後1か月で開始しなければ自動失効する。",
+        "ok": false
+      },
+      {
+        "text": "何年休業しても登録取消しの対象にはならない。",
+        "ok": false
+      },
+      {
+        "text": "登録後10年は開業の有無を問わず取消しできない。",
+        "ok": false
+      }
+    ],
+    "explanation": "1年以内に開始せず、または引き続き1年以上業務を行っていないと認められると、登録取消しの対象。",
+    "source": "https://www.ktr.mlit.go.jp/kensan/index00000029.html",
+    "sourceName": "国交省関東地方整備局：FAQ",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K009",
+    "category": "登録・業務管理",
+    "topic": "業務管理者",
+    "question": "業務管理者の配置について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "業務管理者は契約ごとに1名選任する。",
+        "ok": false
+      },
+      {
+        "text": "営業所または事務所ごとに1名以上配置する。",
+        "ok": true
+      },
+      {
+        "text": "会社全体で1名いればすべての営業所に配置不要である。",
+        "ok": false
+      },
+      {
+        "text": "管理戸数200戸ごとに必ず1名配置する。",
+        "ok": false
+      }
+    ],
+    "explanation": "営業所・事務所単位で1名以上。戸数比例の人数要件ではない。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/administrator_duties.html",
+    "sourceName": "国交省：管理業者の業務",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K010",
+    "category": "登録・業務管理",
+    "topic": "兼務",
+    "question": "業務管理者について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "業務管理者は必ず取締役でなければならない。",
+        "ok": false
+      },
+      {
+        "text": "業務管理者は必ず無期雇用の正社員でなければならない。",
+        "ok": false
+      },
+      {
+        "text": "適切な管理・監督体制を確保できれば、宅建士等との兼務が法令上当然には禁止されない。",
+        "ok": true
+      },
+      {
+        "text": "法律上、業務管理者はすべての副業を禁止される。",
+        "ok": false
+      }
+    ],
+    "explanation": "兼務自体は禁止ではないが、管理業務の指導・監督に従事できる必要がある。",
+    "source": "https://www.ktr.mlit.go.jp/kensan/index00000029.html",
+    "sourceName": "国交省関東地方整備局：FAQ",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K011",
+    "category": "登録・業務管理",
+    "topic": "重要事項説明",
+    "question": "管理受託契約の締結前に必要な対応として正しいものはどれか。",
+    "choices": [
+      {
+        "text": "契約後に口頭報告するだけで足りる。",
+        "ok": false
+      },
+      {
+        "text": "重要事項説明は入居者にだけ行う。",
+        "ok": false
+      },
+      {
+        "text": "管理報酬の説明は法律上禁止されている。",
+        "ok": false
+      },
+      {
+        "text": "管理内容や報酬等について書面を交付して説明する。",
+        "ok": true
+      }
+    ],
+    "explanation": "管理受託契約の相手方となるオーナーに対し、締結前に書面交付・説明を行う。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/administrator_duties.html",
+    "sourceName": "国交省：管理業者の業務",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K012",
+    "category": "登録・業務管理",
+    "topic": "説明者",
+    "question": "管理受託契約の重要事項を説明する者について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "法律上、説明者は必ずしも業務管理者本人である必要はない。",
+        "ok": true
+      },
+      {
+        "text": "必ず行政書士が行う。",
+        "ok": false
+      },
+      {
+        "text": "必ず賃貸人自身が説明する。",
+        "ok": false
+      },
+      {
+        "text": "必ず業務管理者だけが行い、他の従業員は一切できない。",
+        "ok": false
+      }
+    ],
+    "explanation": "業務管理者等の知識・経験ある者が説明することを推奨するが、説明者を業務管理者に限定していない。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/faq.html",
+    "sourceName": "国交省：FAQ",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K013",
+    "category": "登録・業務管理",
+    "topic": "説明から締結",
+    "question": "管理受託契約の説明と締結の間隔について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "説明から締結までは必ず1年以上あける。",
+        "ok": false
+      },
+      {
+        "text": "国交省は説明から契約まで1週間程度あけることを推奨している。",
+        "ok": true
+      },
+      {
+        "text": "法律で必ず30日以上あけなければならない。",
+        "ok": false
+      },
+      {
+        "text": "法律上、説明した瞬間に締結しなければならない。",
+        "ok": false
+      }
+    ],
+    "explanation": "1週間程度は推奨であり、すべての契約で法律上の絶対的な待機期間というわけではない。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/faq.html",
+    "sourceName": "国交省：FAQ",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K014",
+    "category": "登録・業務管理",
+    "topic": "契約締結時書面",
+    "question": "管理受託契約が成立した直後の法定対応として正しいものはどれか。",
+    "choices": [
+      {
+        "text": "契約前説明書を交付していれば締結時書面は常に不要である。",
+        "ok": false
+      },
+      {
+        "text": "締結時書面は入居者だけに交付する。",
+        "ok": false
+      },
+      {
+        "text": "契約内容を記載した締結時書面を遅滞なく交付する。",
+        "ok": true
+      },
+      {
+        "text": "締結時書面は5年以内に渡せばよい。",
+        "ok": false
+      }
+    ],
+    "explanation": "締結前の重要事項説明書と、成立後の契約締結時書面は別の義務。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/administrator_duties.html",
+    "sourceName": "国交省：管理業者の業務",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K015",
+    "category": "登録・業務管理",
+    "topic": "財産の分別",
+    "question": "管理業者が扱う家賃等の分別管理について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "管理業者自身の固有財産と区分して管理する必要がある。",
+        "ok": true
+      },
+      {
+        "text": "自己の運転資金として自由に混用できる。",
+        "ok": false
+      },
+      {
+        "text": "現金で保管すれば帳簿等による識別は一切不要である。",
+        "ok": false
+      },
+      {
+        "text": "所有者が異なっても契約ごとの識別は不要である。",
+        "ok": false
+      }
+    ],
+    "explanation": "家賃・敷金等は固有財産と区別し、管理受託契約ごとの金銭を識別可能にする。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/administrator_duties.html",
+    "sourceName": "国交省：管理業者の業務",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K016",
+    "category": "登録・業務管理",
+    "topic": "帳簿管理",
+    "question": "家賃等の金銭管理に関する説明で正しいものはどれか。",
+    "choices": [
+      {
+        "text": "資金の帰属確認は会計年度末だけ行えば必ず足りる。",
+        "ok": false
+      },
+      {
+        "text": "どの管理受託契約の金銭か帳簿・会計ソフト等で判別できるようにする。",
+        "ok": true
+      },
+      {
+        "text": "金銭を一つの口座に集めれば契約別の記録は不要である。",
+        "ok": false
+      },
+      {
+        "text": "契約番号の管理は法により禁止されている。",
+        "ok": false
+      }
+    ],
+    "explanation": "物件・契約ごとに受領金銭の帰属を識別できる管理が求められる。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/administrator_duties.html",
+    "sourceName": "国交省：管理業者の業務",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K017",
+    "category": "登録・業務管理",
+    "topic": "定期報告",
+    "question": "管理業者から委託者への業務状況報告について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "10年に1回だけ報告すればよい。",
+        "ok": false
+      },
+      {
+        "text": "賃貸人に対する定期報告の義務は一切ない。",
+        "ok": false
+      },
+      {
+        "text": "原則として少なくとも年1回は定期報告する。",
+        "ok": true
+      },
+      {
+        "text": "5年に1回で必ず足りる。",
+        "ok": false
+      }
+    ],
+    "explanation": "管理業務の実施状況など、原則年1回以上の頻度で報告する。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/administrator_duties.html",
+    "sourceName": "国交省：管理業者の業務",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K018",
+    "category": "登録・業務管理",
+    "topic": "報告内容",
+    "question": "管理受託契約に基づく定期報告の項目として適切なものはどれか。",
+    "choices": [
+      {
+        "text": "業務管理者の私的な年間収入。",
+        "ok": false
+      },
+      {
+        "text": "入居者の趣味嗜好を独自に調査した結果。",
+        "ok": false
+      },
+      {
+        "text": "他社の営業秘密を必ず報告する。",
+        "ok": false
+      },
+      {
+        "text": "家賃等の収受状況や苦情の発生・対応状況。",
+        "ok": true
+      }
+    ],
+    "explanation": "維持保全の実施状況、家賃等の収受状況、苦情の発生・対応状況などを報告。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/administrator_duties.html",
+    "sourceName": "国交省：管理業者の業務",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K019",
+    "category": "登録・業務管理",
+    "topic": "証明書",
+    "question": "賃貸住宅管理業に従事する者の証明書について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "管理業務に従事する従業者には、原則として従業者証明書を携帯させる。",
+        "ok": true
+      },
+      {
+        "text": "証明書の携帯は一律に禁止されている。",
+        "ok": false
+      },
+      {
+        "text": "従業者は個人の運転免許証を見せれば法定証明書の代わりとなる。",
+        "ok": false
+      },
+      {
+        "text": "名刺を持っていれば法律上の証明書は絶対に不要となる。",
+        "ok": false
+      }
+    ],
+    "explanation": "賃貸住宅管理業に従事する者は所定の従業者証明書を携帯する。内部事務のみの者など取扱いに注意。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/administrator_duties.html",
+    "sourceName": "国交省：管理業者の業務",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K020",
+    "category": "登録・業務管理",
+    "topic": "帳簿",
+    "question": "賃貸住宅管理業者の帳簿について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "帳簿に管理受託契約の内容は記載できない。",
+        "ok": false
+      },
+      {
+        "text": "営業所または事務所ごとに備え付ける。",
+        "ok": true
+      },
+      {
+        "text": "本店にだけ1冊あれば必ず足りる。",
+        "ok": false
+      },
+      {
+        "text": "賃貸人の自宅ごとに必ず備える。",
+        "ok": false
+      }
+    ],
+    "explanation": "営業所・事務所ごとに、管理受託契約についての所定事項を記録する。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/administrator_duties.html",
+    "sourceName": "国交省：管理業者の業務",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K021",
+    "category": "登録・業務管理",
+    "topic": "帳簿保存",
+    "question": "管理受託契約に関する帳簿の保存期間として正しいものはどれか。",
+    "choices": [
+      {
+        "text": "1か月間だけ保存すればよい。",
+        "ok": false
+      },
+      {
+        "text": "一律に30年間保存する。",
+        "ok": false
+      },
+      {
+        "text": "事業年度の末日から5年間保存する。",
+        "ok": true
+      },
+      {
+        "text": "作成した当日だけ保存すればよい。",
+        "ok": false
+      }
+    ],
+    "explanation": "帳簿の保存は各事業年度の末日から5年間。",
+    "source": "https://www.cbr.mlit.go.jp/kensei/info/license/pdf/faq_a.pdf",
+    "sourceName": "国交省：FAQ抜粋",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K022",
+    "category": "登録・業務管理",
+    "topic": "標識",
+    "question": "登録を受けた賃貸住宅管理業者の標識について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "本店のみで一切足りる。",
+        "ok": false
+      },
+      {
+        "text": "車両のダッシュボードだけに掲示する。",
+        "ok": false
+      },
+      {
+        "text": "営業所には掲示してはならない。",
+        "ok": false
+      },
+      {
+        "text": "営業所または事務所ごとの公衆の見やすい場所に掲示する。",
+        "ok": true
+      }
+    ],
+    "explanation": "標識は営業所・事務所単位で掲示する。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/administrator_duties.html",
+    "sourceName": "国交省：管理業者の業務",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K023",
+    "category": "登録・業務管理",
+    "topic": "全部再委託",
+    "question": "受託した賃貸住宅管理業務の再委託について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "管理業務の全部を他者へ再委託することは禁止される。",
+        "ok": true
+      },
+      {
+        "text": "全部再委託は必ず義務付けられる。",
+        "ok": false
+      },
+      {
+        "text": "すべての業務を外注し管理業者自身は何もしなくてもよい。",
+        "ok": false
+      },
+      {
+        "text": "再委託について法律の規定は存在しない。",
+        "ok": false
+      }
+    ],
+    "explanation": "管理受託した業務の全部の再委託は禁止。",
+    "source": "https://www.hkd.mlit.go.jp/ky/jg/kensan/slo5pa000000x3wf-att/slo5pa000000x469.pdf",
+    "sourceName": "国交省：再委託の解説",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K024",
+    "category": "登録・業務管理",
+    "topic": "一部再委託",
+    "question": "賃貸住宅管理業務の一部再委託について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "一部再委託すると登録は必ず即時失効する。",
+        "ok": false
+      },
+      {
+        "text": "管理受託契約に定めがあり、自ら再委託先を指導・監督するなどの条件の下で可能である。",
+        "ok": true
+      },
+      {
+        "text": "一部の再委託も常に刑事罰の対象となる。",
+        "ok": false
+      },
+      {
+        "text": "一部再委託は書面での取決めに一切関係なく無制限に可能である。",
+        "ok": false
+      }
+    ],
+    "explanation": "全部再委託は禁止。一部再委託は契約内容と管理業者の指導監督を踏まえた取扱いが可能。",
+    "source": "https://www.hkd.mlit.go.jp/ky/jg/kensan/slo5pa000000x3wf-att/slo5pa000000x469.pdf",
+    "sourceName": "国交省：再委託の解説",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K025",
+    "category": "サブリース",
+    "topic": "契約の構造",
+    "question": "マスターリース契約の基本的な当事者関係として正しいものはどれか。",
+    "choices": [
+      {
+        "text": "管理会社が入居者へ売買代金を払う契約。",
+        "ok": false
+      },
+      {
+        "text": "サブリース業者が消防署と設備点検を契約すること。",
+        "ok": false
+      },
+      {
+        "text": "建物所有者がサブリース業者に賃貸する契約。",
+        "ok": true
+      },
+      {
+        "text": "入居者が建物所有者から所有権を購入する契約。",
+        "ok": false
+      }
+    ],
+    "explanation": "マスターリースはオーナーからサブリース業者への貸付け。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/sublease.html",
+    "sourceName": "国交省：サブリース規制",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K026",
+    "category": "サブリース",
+    "topic": "転貸借",
+    "question": "サブリースで入居者が賃貸住宅を借りる契約について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "オーナーが金融機関から住宅ローンを借りる契約である。",
+        "ok": false
+      },
+      {
+        "text": "所有者から建設会社への工事請負契約である。",
+        "ok": false
+      },
+      {
+        "text": "管理者が国に登録申請する契約である。",
+        "ok": false
+      },
+      {
+        "text": "一般にサブリース業者から入居者への転貸借契約である。",
+        "ok": true
+      }
+    ],
+    "explanation": "オーナー→サブリース業者がマスターリース、業者→入居者が転貸借。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/sublease.html",
+    "sourceName": "国交省：サブリース規制",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K027",
+    "category": "サブリース",
+    "topic": "誇大広告",
+    "question": "特定賃貸借契約についての広告規制で正しいものはどれか。",
+    "choices": [
+      {
+        "text": "実際と著しく異なる条件や誤認させるような表示は禁止される。",
+        "ok": true
+      },
+      {
+        "text": "インターネット広告だけは誇大表示が自由である。",
+        "ok": false
+      },
+      {
+        "text": "広告では必ず家賃が将来増額すると表示する。",
+        "ok": false
+      },
+      {
+        "text": "契約条件が変わる可能性を伏せることが義務である。",
+        "ok": false
+      }
+    ],
+    "explanation": "サブリース事業者等には誇大広告の禁止がある（法28条）。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/sublease.html",
+    "sourceName": "国交省：サブリース規制・法28条",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K028",
+    "category": "サブリース",
+    "topic": "不当勧誘",
+    "question": "サブリース契約の勧誘について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "虚偽説明でもオーナーに損害がなければ常に適法である。",
+        "ok": false
+      },
+      {
+        "text": "契約解除の妨害は法律上無制限に許される。",
+        "ok": false
+      },
+      {
+        "text": "相手の判断をゆがめるような不正確な情報や強引な勧誘は禁止される。",
+        "ok": true
+      },
+      {
+        "text": "契約に影響する不利な事実は必ず隠さなければならない。",
+        "ok": false
+      }
+    ],
+    "explanation": "不当勧誘等は法29条で禁止される。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/sublease.html",
+    "sourceName": "国交省：サブリース規制・法29条",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K029",
+    "category": "サブリース",
+    "topic": "勧誘者",
+    "question": "サブリース契約を勧誘する者への規制について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "規制は物件の入居者にだけ適用される。",
+        "ok": false
+      },
+      {
+        "text": "建設会社などが勧誘に関与しても一切規制されない。",
+        "ok": false
+      },
+      {
+        "text": "サブリース業者以外の勧誘はすべて規制対象外である。",
+        "ok": false
+      },
+      {
+        "text": "サブリース業者のほか、勧誘者も不当勧誘規制の対象となり得る。",
+        "ok": true
+      }
+    ],
+    "explanation": "サブリース業者と勧誘者が対象。建設業者等の勧誘も該当し得る。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/sublease.html",
+    "sourceName": "国交省：サブリース規制",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K030",
+    "category": "サブリース",
+    "topic": "説明前置",
+    "question": "特定賃貸借契約（マスターリース）の締結に際して必要な説明として正しいものはどれか。",
+    "choices": [
+      {
+        "text": "契約前にオーナーとなる者へ重要事項の書面を交付し、説明する。",
+        "ok": true
+      },
+      {
+        "text": "契約後1年以内であれば説明を省略できる。",
+        "ok": false
+      },
+      {
+        "text": "契約内容の説明をする相手は入居者だけである。",
+        "ok": false
+      },
+      {
+        "text": "管理会社の営業用パンフレットがあれば、説明義務は必ず消える。",
+        "ok": false
+      }
+    ],
+    "explanation": "特定賃貸借契約では法30条の重要事項説明・書面交付が必要。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/sublease.html",
+    "sourceName": "国交省：サブリース規制・法30条",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K031",
+    "category": "サブリース",
+    "topic": "説明者",
+    "question": "特定賃貸借契約の重要事項説明者について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "借主本人がオーナーの立場で説明しなければならない。",
+        "ok": false
+      },
+      {
+        "text": "法令上の特定資格の限定はないが、専門知識のある者が説明することが望ましい。",
+        "ok": true
+      },
+      {
+        "text": "必ず公認会計士でなければならない。",
+        "ok": false
+      },
+      {
+        "text": "必ず宅建士でなければならないと法30条にある。",
+        "ok": false
+      }
+    ],
+    "explanation": "説明者について特定資格の法律上の限定はなく、知識・経験を持つ者による説明が望ましい。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/sublease.html",
+    "sourceName": "国交省：サブリース規制",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K032",
+    "category": "サブリース",
+    "topic": "締結時書面",
+    "question": "マスターリース契約の締結時に関して正しいものはどれか。",
+    "choices": [
+      {
+        "text": "契約時書面に賃料を記載してはならない。",
+        "ok": false
+      },
+      {
+        "text": "契約時の書面は国が交付し、業者には義務がない。",
+        "ok": false
+      },
+      {
+        "text": "契約期間や賃料など所定事項を書いた書面を交付する義務がある。",
+        "ok": true
+      },
+      {
+        "text": "契約時書面の交付は常に禁止される。",
+        "ok": false
+      }
+    ],
+    "explanation": "サブリース事業者は法31条の契約時書面を交付する。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/sublease.html",
+    "sourceName": "国交省：サブリース規制・法31条",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K033",
+    "category": "サブリース",
+    "topic": "書類閲覧",
+    "question": "特定転貸事業者の書類閲覧に関する説明で正しいものはどれか。",
+    "choices": [
+      {
+        "text": "業務・財産関係の書類は法令上すべて備置きが禁止される。",
+        "ok": false
+      },
+      {
+        "text": "閲覧は会社の株主以外に一切認められない。",
+        "ok": false
+      },
+      {
+        "text": "管理する住宅の入居者全員に個人の銀行口座を公開する義務がある。",
+        "ok": false
+      },
+      {
+        "text": "事業・財産状況の書類を備え置き、契約相手方等の請求に応じて閲覧させる義務がある。",
+        "ok": true
+      }
+    ],
+    "explanation": "法32条は特定転貸事業者の業務・財産状況書類の備置きと閲覧を規定。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/sublease.html",
+    "sourceName": "国交省：サブリース規制・法32条",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K034",
+    "category": "サブリース",
+    "topic": "登録とサブリース",
+    "question": "サブリース規制と管理業登録について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "管理業の登録がなくても、特定転貸事業者に対する法定規制は適用され得る。",
+        "ok": true
+      },
+      {
+        "text": "管理業登録がない事業者の誇大広告は常に自由である。",
+        "ok": false
+      },
+      {
+        "text": "管理業登録がないとマスターリース契約は民法上必ず無効になる。",
+        "ok": false
+      },
+      {
+        "text": "管理業登録の有無で特定転貸事業者の概念は自動的に消滅する。",
+        "ok": false
+      }
+    ],
+    "explanation": "特定転貸事業者・勧誘者への規制は管理業登録と独立して適用される。",
+    "source": "https://www.ktr.mlit.go.jp/kensan/index00000029.html",
+    "sourceName": "国交省関東地方整備局：FAQ",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K035",
+    "category": "サブリース",
+    "topic": "説明期間",
+    "question": "特定賃貸借契約の重要事項説明のタイミングに関する説明で正しいものはどれか。",
+    "choices": [
+      {
+        "text": "説明をする前に必ず契約を成立させる必要がある。",
+        "ok": false
+      },
+      {
+        "text": "契約判断のため、説明から締結まで1週間程度の期間を置くことが望ましい。",
+        "ok": true
+      },
+      {
+        "text": "すべての契約で法律上180日以上の間隔が義務である。",
+        "ok": false
+      },
+      {
+        "text": "契約前説明の翌日以降に締結すると必ず違法となる。",
+        "ok": false
+      }
+    ],
+    "explanation": "説明から締結まで1週間程度を設けることが望ましいという行政上の考え方。",
+    "source": "https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/pm_portal/sublease.html",
+    "sourceName": "国交省：サブリース規制",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K036",
+    "category": "原状回復・契約実務",
+    "topic": "通常損耗",
+    "question": "賃貸住宅の原状回復に関する原則として正しいものはどれか。",
+    "choices": [
+      {
+        "text": "建物が古くなること自体が常に借主の過失である。",
+        "ok": false
+      },
+      {
+        "text": "入居時より新しくする費用は必ず借主に請求できる。",
+        "ok": false
+      },
+      {
+        "text": "通常の使用による損耗や経年変化は、原則として賃借人の原状回復義務に含まれない。",
+        "ok": true
+      },
+      {
+        "text": "通常損耗は例外なくすべて借主が新品交換する。",
+        "ok": false
+      }
+    ],
+    "explanation": "通常損耗・経年変化は賃料の対価に含まれると考える。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_tk3_000020.html",
+    "sourceName": "国交省：原状回復ガイドライン",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K037",
+    "category": "原状回復・契約実務",
+    "topic": "故意過失",
+    "question": "借主の不注意で壁を損傷させた場合の原状回復について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "借主が故意に壁を壊しても常に貸主だけが負担する。",
+        "ok": false
+      },
+      {
+        "text": "すべての損傷は管理会社が無条件で負担する。",
+        "ok": false
+      },
+      {
+        "text": "借主の故意・過失による損傷は原状回復と無関係である。",
+        "ok": false
+      },
+      {
+        "text": "故意・過失や通常を超える使用による損傷は借主負担となり得る。",
+        "ok": true
+      }
+    ],
+    "explanation": "通常の使用を超える故意・過失等による損耗の復旧が原状回復の対象。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_tk3_000020.html",
+    "sourceName": "国交省：原状回復ガイドライン",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K038",
+    "category": "原状回復・契約実務",
+    "topic": "経過年数",
+    "question": "原状回復費用の算定に関する考え方として正しいものはどれか。",
+    "choices": [
+      {
+        "text": "修繕対象の種類によっては経過年数を考慮して負担割合を計算する。",
+        "ok": true
+      },
+      {
+        "text": "すべての設備は築年数に関係なく新品価格を借主が負担する。",
+        "ok": false
+      },
+      {
+        "text": "経過年数は法律上必ず100年間無視する。",
+        "ok": false
+      },
+      {
+        "text": "経過年数の考慮は原状回復ガイドラインで一切触れられていない。",
+        "ok": false
+      }
+    ],
+    "explanation": "部材・設備に応じ、経過年数の考慮や部分補修など適切な算定方法を使う。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_tk3_000020.html",
+    "sourceName": "国交省：原状回復ガイドライン",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K039",
+    "category": "原状回復・契約実務",
+    "topic": "入退去確認",
+    "question": "原状回復をめぐる紛争予防策として適切なものはどれか。",
+    "choices": [
+      {
+        "text": "退去後に全ての傷の原因を推測するだけで証拠として必ず十分である。",
+        "ok": false
+      },
+      {
+        "text": "入居時と退去時に物件状況を確認し、写真やチェックリストに残す。",
+        "ok": true
+      },
+      {
+        "text": "入居時の傷を記録しないことが必須である。",
+        "ok": false
+      },
+      {
+        "text": "貸主と借主の確認作業は法律で禁止される。",
+        "ok": false
+      }
+    ],
+    "explanation": "入退去時の記録は、損傷の発生時期や原因についての争いを減らす。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_tk3_000024.html",
+    "sourceName": "国交省：原状回復Q&A",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K040",
+    "category": "原状回復・契約実務",
+    "topic": "クリーニング特約",
+    "question": "退去時清掃費用の特約について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "クリーニング特約は例外なくすべて無効である。",
+        "ok": false
+      },
+      {
+        "text": "金額や範囲が不明な特約ほど必ず有効になる。",
+        "ok": false
+      },
+      {
+        "text": "内容の明確さや費用の妥当性等によって有効性を判断する。",
+        "ok": true
+      },
+      {
+        "text": "クリーニング特約は書けば常に全額有効である。",
+        "ok": false
+      }
+    ],
+    "explanation": "特約の有効性は具体的な負担範囲・説明・費用の妥当性などを考慮する。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_tk3_000024.html",
+    "sourceName": "国交省：原状回復Q&A",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K041",
+    "category": "原状回復・契約実務",
+    "topic": "原状回復の意味",
+    "question": "「原状回復」の意味について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "退去時には必ずすべての設備を新品にする意味である。",
+        "ok": false
+      },
+      {
+        "text": "借主の故意による損傷も一切対象外である。",
+        "ok": false
+      },
+      {
+        "text": "原状回復は家賃の増額のみを意味する。",
+        "ok": false
+      },
+      {
+        "text": "入居当初の新品状態に戻すことと常に同じではない。",
+        "ok": true
+      }
+    ],
+    "explanation": "通常損耗まで新品交換する制度ではなく、故意・過失等による損傷の復旧が中心。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_tk3_000020.html",
+    "sourceName": "国交省：原状回復ガイドライン",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K042",
+    "category": "原状回復・契約実務",
+    "topic": "特約の理解",
+    "question": "通常の原状回復義務を超える特約の取扱いとして適切なものはどれか。",
+    "choices": [
+      {
+        "text": "必要性や合理性、借主の認識・意思表示などが重要となる。",
+        "ok": true
+      },
+      {
+        "text": "特約は貸主が一方的に紙へ書くだけで常に有効となる。",
+        "ok": false
+      },
+      {
+        "text": "特約は契約書に何もなくても必ず借主に無制限の費用負担を生む。",
+        "ok": false
+      },
+      {
+        "text": "合理性の検討は国交省ガイドラインで否定されている。",
+        "ok": false
+      }
+    ],
+    "explanation": "通常の負担を超える特約は合理性や明確な合意が重要。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_tk3_000024.html",
+    "sourceName": "国交省：原状回復Q&A",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K043",
+    "category": "原状回復・契約実務",
+    "topic": "水垢放置",
+    "question": "浴室の清掃を長期間怠り、水垢やカビを拡大させた場合の基本的な考え方はどれか。",
+    "choices": [
+      {
+        "text": "水回りは何が起きても借主に注意義務はない。",
+        "ok": false
+      },
+      {
+        "text": "借主の手入れ不足として、通常損耗を超える部分が借主負担となり得る。",
+        "ok": true
+      },
+      {
+        "text": "使用中の手入れ不足は原状回復に一切関係しない。",
+        "ok": false
+      },
+      {
+        "text": "入居期間中に発生したカビはすべて必ず貸主負担である。",
+        "ok": false
+      }
+    ],
+    "explanation": "清掃・手入れを怠って発生・拡大した損傷は善管注意義務違反と判断され得る。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_tk3_000020.html",
+    "sourceName": "国交省：原状回復ガイドライン",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K044",
+    "category": "原状回復・契約実務",
+    "topic": "設備設置",
+    "question": "DIY型賃貸借の契約上の留意点として適切なものはどれか。",
+    "choices": [
+      {
+        "text": "改修工事の内容は契約上すべて不明にしておくべきである。",
+        "ok": false
+      },
+      {
+        "text": "DIY型賃貸借では退去時の取扱いを決めることが禁止される。",
+        "ok": false
+      },
+      {
+        "text": "工事内容と退去時の原状回復の有無等を貸主借主で明確に合意する。",
+        "ok": true
+      },
+      {
+        "text": "借主は貸主に知らせず構造躯体を自由に変更できる。",
+        "ok": false
+      }
+    ],
+    "explanation": "DIY型賃貸借では改修範囲・合意・返還時の取扱いを明確にする。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_tk3_000046.html",
+    "sourceName": "国交省：DIY型賃貸借",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K045",
+    "category": "原状回復・契約実務",
+    "topic": "貸主指定施工",
+    "question": "原状回復工事の実施者について、契約内容の確認が必要な理由として正しいものはどれか。",
+    "choices": [
+      {
+        "text": "どんな契約でも借主は無条件で自由に施工者を決められる。",
+        "ok": false
+      },
+      {
+        "text": "契約の工事実施方法は民法上必ず無効である。",
+        "ok": false
+      },
+      {
+        "text": "施工者の合意は一切トラブルと関係しない。",
+        "ok": false
+      },
+      {
+        "text": "契約で貸主指定業者による施工と定めている場合、借主が勝手に別業者へ頼めない場合がある。",
+        "ok": true
+      }
+    ],
+    "explanation": "誰が工事するかは契約条項によって異なり、国交省Q&Aも確認を求めている。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/house/jutakukentiku_house_tk3_000024.html",
+    "sourceName": "国交省：原状回復Q&A",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K046",
+    "category": "建物・設備・実務",
+    "topic": "報告対象",
+    "question": "国が全国一律で建築基準法上の定期報告対象に指定するものとして適切なものはどれか。",
+    "choices": [
+      {
+        "text": "入居者の個人用自転車。",
+        "ok": false
+      },
+      {
+        "text": "一定のエレベーター等の昇降機。",
+        "ok": true
+      },
+      {
+        "text": "全国のすべての私有の机。",
+        "ok": false
+      },
+      {
+        "text": "あらゆる住宅の家庭用テレビ。",
+        "ok": false
+      }
+    ],
+    "explanation": "昇降機のほか、一定の不特定多数利用施設などが対象。個別の報告対象は建物条件等で異なる。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/build/jutakukentiku_house_tk_000039.html",
+    "sourceName": "国交省：建築基準法定期報告",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K047",
+    "category": "建物・設備・実務",
+    "topic": "対象建物",
+    "question": "建築基準法上の定期報告の対象建築物について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "特定行政庁には報告対象を指定する権限が一切ない。",
+        "ok": false
+      },
+      {
+        "text": "建築物の用途は定期報告に全く関係しない。",
+        "ok": false
+      },
+      {
+        "text": "地域の事情に応じて特定行政庁が対象を定める場合もある。",
+        "ok": true
+      },
+      {
+        "text": "報告対象はすべての自治体で完全に同じである。",
+        "ok": false
+      }
+    ],
+    "explanation": "全国一律の対象に加え、特定行政庁が地域事情に応じて指定できる。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/build/jutakukentiku_house_tk_000039.html",
+    "sourceName": "国交省：建築基準法定期報告",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K048",
+    "category": "建物・設備・実務",
+    "topic": "調査資格",
+    "question": "建築基準法上の法定定期調査・検査について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "入居者なら資格なく法定調査を代行できる。",
+        "ok": false
+      },
+      {
+        "text": "管理会社の名刺があれば法律上の資格要件を当然に満たす。",
+        "ok": false
+      },
+      {
+        "text": "建築物の法定調査には担当者の資格が全く関係しない。",
+        "ok": false
+      },
+      {
+        "text": "所定の資格者が行う必要がある。",
+        "ok": true
+      }
+    ],
+    "explanation": "法定の定期調査・検査には関係法令で定める資格者が必要。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/build/jutakukentiku_house_tk_000039.html",
+    "sourceName": "国交省：建築基準法定期報告",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K049",
+    "category": "建物・設備・実務",
+    "topic": "報告先",
+    "question": "建築基準法12条の定期報告の一般的な報告先について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "特定行政庁。",
+        "ok": true
+      },
+      {
+        "text": "必ず契約した家財保険会社。",
+        "ok": false
+      },
+      {
+        "text": "住宅ローンを借りた銀行。",
+        "ok": false
+      },
+      {
+        "text": "入居者の勤務先企業。",
+        "ok": false
+      }
+    ],
+    "explanation": "定期調査・検査の結果は特定行政庁へ報告する制度。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/build/jutakukentiku_house_tk_000160.html",
+    "sourceName": "国交省：建築基準法定期報告",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  },
+  {
+    "id": "K050",
+    "category": "建物・設備・実務",
+    "topic": "オンライン申請",
+    "question": "建築基準法上の定期報告の提出方法について正しいものはどれか。",
+    "choices": [
+      {
+        "text": "すべての自治体でSNSの個人メッセージだけで正式提出できる。",
+        "ok": false
+      },
+      {
+        "text": "条件を満たせばオンラインで報告することも可能である。",
+        "ok": true
+      },
+      {
+        "text": "電子的な提出は法律上絶対に禁止される。",
+        "ok": false
+      },
+      {
+        "text": "提出には必ず入居者全員の自筆署名が必要である。",
+        "ok": false
+      }
+    ],
+    "explanation": "制度上はオンライン活用が可能。実際の受付方法は行政庁の運用を確認する。",
+    "source": "https://www.mlit.go.jp/jutakukentiku/build/jutakukentiku_house_tk_000160.html",
+    "sourceName": "国交省：オンラインを活用した定期報告",
+    "basisDate": "2026-04-01",
+    "verified": "一次資料確認済み"
+  }
+]
+ 
