@@ -1,0 +1,36 @@
+/* LoopQ 2026: Accessible light redesign, reduced action density */
+:root {color-scheme: light; --bg:#f7f9fc;--panel:#fff;--panel2:#f0f5fa;--border:#e3e9ef;
+--text:#192b3e;--muted:#5a6e80;--lav:#524db7;--cyan:#0b8077;--rose:#bd4b6e;--green:#087c62;
+--shadow:0 11px 36px rgba(28,52,74,.06)}
+body{background:var(--bg);color:var(--text);letter-spacing:0;}
+.sidebar{background:#fff;border-right:1px solid var(--border);}
+.logo{color:#192b3e}.logo small{color:#708299}.logo-mark{background:#4f59b6;box-shadow:none;border-radius:15px}
+.logo-mark span{color:#bef3e6}.sidebar-label,.side-foot{color:#718296}
+.side-nav button,.mobile-nav button{color:#61758a}.side-nav button.active,.side-nav button:hover{background:#eaf1ff;color:#33458e;box-shadow:none}.side-nav button.active{box-shadow:inset 3px 0 #6374d4}
+.side-note{background:linear-gradient(145deg,#eff3fc,#e9f7f2);border:1px solid #dce7f2;color:#2b4156}.side-note p{color:#5c7083}.side-note-orb{color:#4a70ae}
+.topbar{background:#fff;border-bottom:1px solid var(--border)}.breadcrumb{color:#77889a}.breadcrumb span{color:#b1bfcc}.breadcrumb strong{color:#31495d}
+.private-tag{background:#edf8f4;border:1px solid #cfe9dd;color:#0a735e}.live-dot{background:#239676}.iconbutton{background:#f6f8fb;border:1px solid #dce4ee;color:#42596c}
+.content{max-width:1150px;padding-top:32px}.eyebrow{color:#5266a8;letter-spacing:1.3px}.headline{letter-spacing:-1.4px}.highlight{background:linear-gradient(90deg,#4a5cba,#087d81);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero{background:#fff;border:1px solid #e0e8f2;box-shadow:var(--shadow);position:relative}.hero:before{content:'';position:absolute;width:250px;height:250px;border-radius:50%;background:#e7f5f2;right:-90px;top:-110px;pointer-events:none}.hero h1{color:#1e3146}.hero p{color:#5c7186}.hero-art{background:#e5edff;box-shadow:12px 15px 0 #e3ecf3;border:1px solid #d4dffa}.hero-art span{color:#5066b3}.hero-art i{color:#0b8077}
+.btn{background:#fff;color:#34495c;border:1px solid #d7e1ec;box-shadow:none;min-height:44px}
+.btn:hover{background:#f0f5fc}.btn.primary{background:#4f5fc2;color:#fff;border-color:#4f5fc2;box-shadow:none}.btn.primary:hover{background:#4352ae}
+.btn.teal{background:#edf8f5;color:#087568;border-color:#cde8e0}.btn.ghost{background:#fff;color:#415a6d;border-color:#dae3ea}.btn.danger{background:#fff5f5;color:#b34553;border-color:#f0cdd1}
+.card,.stat,.source-card{background:white;border:1px solid var(--border);box-shadow:var(--shadow)}.stat small,.card p,.source-card p{color:var(--muted)}.stat em{color:var(--muted)}
+.tag{background:#f0f1ff;border-color:#e3e3ff;color:#565aa4}.tag.teal{background:#e9f8f3;border-color:#d0eae0;color:#087869}.tag.rose{background:#fff0f2;border-color:#f5d7e0;color:#a14566}.tag.muted{background:#f4f7fa;border-color:#e6ebf0;color:#627688}
+.progressbar{background:#edf1f5}.progressbar span{background:linear-gradient(90deg,#5b6ac6,#0f9483)}
+.empty{background:#fbfcfe;border-color:#d4dfea}.empty-orb{background:#edf0ff;color:#505ab4}.list-row{border-color:#e6ebf0}.list-row .list-icon,.source-card .list-icon{background:#eef2ff;color:#5766b4;border-color:#e1e5f4}.exam-chip{color:#3d65a2}
+.field label,.field .fieldlabel{color:#30465a}.field input,.field select,.field textarea,.handoff-card .code-input{background:#fff;color:#21384a;border:1px solid #cfdae5}.field input:focus,.field select:focus,.field textarea:focus{border-color:#6074d0}.field small{color:#5f7285}
+.drop{background:#f6f9ff;border:2px dashed #bbcee4}.drop:hover,.drop.over{background:#eef5ff;border-color:#6c82d5}.drop-icon{background:#e6edff;color:#5570b2}.photo-thumb{border-color:#e0e7ef}
+.notice{background:#f3f6fb;border:1px solid #dce5f1;color:#4d6175}.notice strong{color:#233e52}.notice.warn{background:#fff9ee;border:1px solid #eddcb9;color:#66532e}.notice.ok{background:#eaf7f1;border-color:#cae8da;color:#2b6554}
+.pill{background:#fff;border:1px solid #d8e0eb;color:#4f6178}.pill.active{background:#4e5caa;border-color:#4e5caa;color:#fff}.source-card .source-bottom{border-color:#e7edf3}
+.answer-choice{background:#fff;color:#273d51;border-color:#d8e2ec}.answer-choice:hover{background:#f3f6ff;border-color:#6177c7}.answer-choice.chosen{background:#e9eaff;border-color:#6974bb}.answer-choice.correct{background:#e4f7ef;border-color:#50ac8c}.answer-choice.wrong{background:#fff0f0;border-color:#d98191}
+.explanation{background:#f4f8fd;border-color:#d7e4f0}.explanation strong{color:#324d99}.explanation p{color:#405970}
+.toggle-line{color:#4d6176}.toggle-line input{accent-color:#5367bd}.details{border-color:#dfe7f0}.divider{border-top-color:#e1e8ee}.toast{background:#233d50;border:1px solid #3a596c;color:#fff}.footer{color:#748699}
+.handoff-card{background:#fff;border:1px solid #dce4ee;box-shadow:var(--shadow)}.handoff-card h3{color:#21384b}.handoff-card p{color:#53687d}.handoff-step{border-bottom-color:#e5ebf0}.handoff-num{background:#e7ecfd;color:#5364b6}.handoff-step-main>strong{color:#253f53}.handoff-card .code-input{color:#21384a}.modal-shade{background:#18304777}.modal-box{background:#fff;border-color:#dbe4ec}
+.ai-local-card{background:linear-gradient(135deg,#f4f7ff,#effbf6);border:1px solid #cbdde9;border-radius:17px;padding:18px;margin:17px 0}.ai-local-card h4{margin:0 0 6px;font-size:16px}.ai-local-card p{color:#4e6478;font-size:12px}.ai-local-card select{background:#fff;border:1px solid #cad6e1;border-radius:10px;padding:10px;max-width:100%;width:100%;color:#243d50}.ai-local-card .smalltext{display:block;margin-top:8px}.ai-local-card .btn{white-space:normal}
+.ai-local-card .button-group{margin-top:12px}.ai-local-card[hidden]{display:none}
+@media(max-width:760px){.topbar{background:#fff}.content{padding-top:25px}.mobile-nav{background:#fffffff2;border-top:1px solid #dce5ee}.mobile-nav button{color:#5b6d7e}.mobile-nav button.active{background:#e9eeff;color:#4759a3}.hero{padding:26px 21px}.hero h1{font-size:30px}.hero-art{display:none}.stats-grid .stat{padding:15px 12px}.stat small{font-size:10px}.stat b{font-size:26px}.card{padding:20px}.button-group{gap:8px}.source-buttons .btn{padding:8px 11px}}
+
+.manual-fallback{margin-top:14px;border:1px solid #dce7ef;border-radius:14px;background:#fff;padding:12px;}
+.manual-fallback>summary{cursor:pointer;color:#52647e;font-weight:750;font-size:13px;padding:6px 5px;}
+.manual-fallback .handoff-card{box-shadow:none;border:none;padding:14px 4px;}
