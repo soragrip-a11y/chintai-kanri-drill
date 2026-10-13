@@ -6,3 +6,10 @@
 /* ChatGPT handoff — active only by user's explicit action. */
 .handoff-card{margin-top:22px;background:linear-gradient(135deg,#22213e,#171f35);border:1px solid #504a78;border-radius:20px;padding:22px}.handoff-card h3{font-size:20px;margin:0 0 8px}.handoff-card p{color:#b8c4da;font-size:13px}.handoff-card .code-input{background:#0c1225;border:1px solid #555678;color:#e6edff;width:100%;border-radius:13px;padding:14px;resize:vertical;min-height:140px;font-size:12px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}.handoff-card .notice{margin-top:12px}.handoff-card .field{margin-top:14px}.handoff-card .btn{white-space:normal;text-align:center}
 @media(max-width:760px){.handoff-card{padding:16px}.handoff-card .button-group{display:grid;grid-template-columns:1fr}.handoff-card .btn{width:100%}}
+
+/* Clear, numbered manual ChatGPT transfer steps. */
+.handoff-step{display:flex;align-items:flex-start;gap:14px;padding:19px 0;border-bottom:1px solid #3d4260}
+.handoff-step-main{flex:1;min-width:0}.handoff-step-main>strong{font-size:15px;color:#f2efff}.handoff-step-main>p{margin:7px 0 13px}
+.handoff-num{flex:0 0 32px;height:32px;display:grid;place-items:center;border-radius:12px;background:#3e3468;color:#e4dcff;font-weight:850}
+.handoff-card .details{margin-top:20px}
+@media(max-width:760px){.handoff-step{gap:10px}.handoff-num{flex-basis:28px;height:28px}.handoff-step-main .btn{width:100%;white-space:normal}}
