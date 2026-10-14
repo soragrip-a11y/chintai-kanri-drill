@@ -4,9 +4,17 @@
  const MAX_PHOTOS=5,MAX_IMAGE_CHARS=25_000_000;
  function parse(text,ids){
   if(!Array.isArray(ids)||!ids.length||ids.length>MAX_PHOTOS||new Set(ids).size!==ids.length||ids.some(id=>typeof id!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(id)))throw Error('対象写真の指定が不正です');
-  const {value,notes}=root.LoopQPastedJSON.extract(text,['sets','questions'],150000);
+  const {value:extracted,notes}=root.LoopQPastedJSON.extract(text,['sets','questions','status'],150000);let value=extracted;
+  const object=value!==null&&typeof value==='object'&&!Array.isArray(value);
+  const complete='対象は'+ids.length+'枚です。写真ごとに3問ずつ含む回答全体を貼り付けてください。この画面の「① 指示文をコピー」から作成し直せます';
+  if(object&&Object.hasOwn(value,'status')&&!Object.hasOwn(value,'questions')&&!Object.hasOwn(value,'sets'))throw Error('完成した問題が含まれていません。「確認中」などの途中の返信は保存できません。'+complete);
   if(ids.length===1&&value&&Object.keys(value).length===1&&Object.hasOwn(value,'questions'))return {sets:[{sourceId:ids[0],questions:root.LoopQPastedJSON.parse(JSON.stringify(value)).questions}],notes};
-  if(!value||Array.isArray(value)||typeof value!=='object'||Object.keys(value).length!==1||!Array.isArray(value.sets)||value.sets.length!==ids.length)throw Error('写真ごとに1セット、各3問が必要です。対象は'+ids.length+'枚です');
+  if(object&&Object.keys(value).length===2&&Object.hasOwn(value,'sourceId')&&Object.hasOwn(value,'questions')){
+   if(ids.length!==1)throw Error('回答は写真1枚分です。'+complete);
+   value={sets:[value]};
+  }
+  if(!value||Array.isArray(value)||typeof value!=='object'||Object.keys(value).length!==1||!Array.isArray(value.sets))throw Error('JSONの形式が違います。'+complete);
+  if(value.sets.length!==ids.length)throw Error('写真の数が一致しません。'+complete);
   const seen=new Map();
   for(const set of value.sets){
    if(!set||Array.isArray(set)||typeof set!=='object'||Object.keys(set).length!==2||!Object.hasOwn(set,'sourceId')||!Object.hasOwn(set,'questions'))throw Error('各セットにはsourceIdとquestionsだけを指定してください');

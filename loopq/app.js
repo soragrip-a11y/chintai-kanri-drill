@@ -94,7 +94,7 @@ function renderHandoff(r){const pending=pendingSources();renderBatchHandoff(pend
 const JSON_OUTPUT_INSTRUCTIONS="回答は全体を1つのjsonコードブロック（開始行は```json、終了行は```）に入れてください。コードブロックの外に説明文は付けないでください。中身はJSON.parseで読み取れるJSONオブジェクトにしてください。配列は必ず半角の角括弧 [ ]、オブジェクトは { }、キーと文字列は半角の二重引用符を使ってください。括弧をバックスラッシュでエスケープしないでください。丸括弧・数式表記・LaTeX・DIL表記で配列を表さないでください。末尾のカンマやコメントは禁止です。文字列内の二重引用符・改行・バックスラッシュはJSONの規則でエスケープしてください。送信前に括弧の対応、各写真3問、sourceId、answerが真偽値であることを確認してください。";
 function batchPrompt(sources){
  const sample={statement:'具体的な条件を含む問題文',answer:true,explanation:'正誤の理由',reference:'実際に確認した一次資料・条文・適用時点。未確認なら未確認',trap:'要点'};
- const output=sources.length===1?{questions:[sample,{...sample,answer:false},sample]}:{sets:sources.map(r=>({sourceId:r.id,questions:[sample,{...sample,answer:false},sample]}))};
+ const output=sources.length===1?{sourceId:sources[0].id,questions:[sample,{...sample,answer:false},sample]}:{sets:sources.map(r=>({sourceId:r.id,questions:[sample,{...sample,answer:false},sample]}))};
  return `あなたは資格試験の応用問題を作る作問者です。元問題写真は${sources.length}枚です。写真は1枚のまとめ画像、または元写真の個別添付で渡されます。依頼は新しい類題の作成です。作業の選択肢や開始確認は不要です。各写真を独立した出題元として、写真ごとに厳密に3問、合計${sources.length*3}問の新しい○×問題を作ってください。
 対象写真：
 ${sources.map((r,i)=>`${i+1}枚目：sourceId=${r.id}／資格=${r.exam}${r.topic?'／メモ='+r.topic:''}`).join('\n')}
@@ -102,7 +102,8 @@ ${sources.map((r,i)=>`${i+1}枚目：sourceId=${r.id}／資格=${r.exam}${r.topi
 元の文章・選択肢・固有の事例・配置を再利用せず、独立した別の事例を作成してください。難しさは元問題以上とし、各問に当事者・時期・数値・例外等の複数条件を含め、定義確認で水増ししないでください。
 法律系は試験年度と法令基準日を確認してください。未指定なら適用時点を明示し、特定年度向けの確認済みとはしないでください。法令・公的な一次資料で実際に確認した根拠のみ記載し、未確認は未確認と明記してください。各正答を独立に再検証し、疑問があれば作り直してください。
 ${JSON_OUTPUT_INSTRUCTIONS}
-次のJSONは構造の見本です。問題文等は実際の内容に置き換え、キー・sourceIdは変更しないでください。answerはtrue/false、他の4項目は文字列。各写真のquestionsは厳密に3問です。
+${sources.length===1?'写真1枚の完成した回答は、最上位をsourceIdとquestionsの2項目だけにしてください。':'複数写真の完成した回答は、最上位をsetsだけにし、各セットにsourceIdとquestionsを指定してください。'}確認中などの途中の返信（status・message）は完成した回答として出力しないでください。
+次のJSONは構造の見本です。問題文等は実際の内容に置き換え、キー・sourceIdは変更しないでください。各設問の5項目はstatement・answer・explanation・reference・trapです。answerはtrue/false、残りの4項目は文字列。各写真のquestionsは厳密に3問です。
 ${JSON.stringify(output)}`;
 }
 async function prepareShareImage(sources){

@@ -36,3 +36,25 @@ test('next occupies the side just tapped; rapid second tap cannot answer the nex
 test('successful commit is not reported as a failure when subsequent refresh fails',async()=>{
  const {api}=app([record]);api.setRefresh(async()=>{throw Error('read failed')});const saved={...record,id:'new',questions:[]};const result=await api.acceptCommitted([saved]);assert.equal(result[0].id,'new');assert.equal(api.getRecords().some(r=>r.id==='new'),true);assert.equal(api.getRecords().some(r=>r.id==='set'),true);
 });
+test('generated single-photo prompt example includes its actual ID and imports directly; batch example still imports',()=>{
+ const {api}=app();
+ for(const sources of [[{...record,id:'single-photo-id',questions:[]}],[{...record,id:'photo-a',questions:[]},{...record,id:'photo-b',questions:[]}]]){
+  const prompt=api.batchPrompt(sources),sample=JSON.parse(prompt.slice(prompt.lastIndexOf('\n')+1)),ids=sources.map(r=>r.id);
+  if(sources.length===1){assert.deepEqual(Object.keys(sample),['sourceId','questions']);assert.equal(sample.sourceId,ids[0]);assert.match(prompt,/最上位をsourceIdとquestionsの2項目だけ/)}
+  else{assert.deepEqual(sample.sets.map(set=>set.sourceId),ids);assert.match(prompt,/最上位をsetsだけ/)}
+  assert.match(prompt,/各設問の5項目はstatement・answer・explanation・reference・trap/);assert.match(prompt,/途中の返信（status・message）は完成した回答として出力しない/);
+  const result=LoopQBatch.parse('```json\n'+JSON.stringify(sample)+'\n```',ids);
+  assert.deepEqual(result.sets.map(set=>set.sourceId),ids);assert.ok(result.sets.every(set=>set.questions.length===3));
+ }
+});
+test('single sourceId answer saves three questions with unchanged photo; wrong IDs and interim status never save',async()=>{
+ const writes=[],{get,api}=flow(async row=>writes.push(row)),alias=JSON.stringify({sourceId:record.id,questions:[question,question,question]});
+ paste(get,alias);await get('accept-json').onclick();
+ assert.equal(writes.length,1);assert.equal(writes[0].image,image);assert.equal(writes[0].questions.length,3);
+ assert.equal(writes[0].questions[0].statement,question.statement);assert.equal(api.getQuiz().pool.length,3);
+ for(const input of [JSON.stringify({sourceId:'another-photo',questions:[question,question,question]}),'```json\n'+JSON.stringify({status:'確認中',sourceId:record.id,message:'途中の返信'})+'\n```']){
+  const original={...record,questions:[]},before=structuredClone(original),env=flow(async()=>{throw Error('unexpected write')},[original]);
+  paste(env.get,input);await env.get('accept-json').onclick();
+  assert.deepEqual(original,before);assert.equal(env.api.getQuiz(),null);assert.match(env.get('handoff-feedback').textContent,input.includes('status')?/完成した問題が含まれていません/:/写真IDが一致しません/);
+ }
+});
