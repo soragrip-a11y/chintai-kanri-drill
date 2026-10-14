@@ -16,8 +16,8 @@
   }
   walk(0);return value;
  }
- function parse(input){
-  if(typeof input!=='string'||input.length>30000)throw Error('回答は3万文字以内にしてください');
+ function extract(input,roots=['questions'],limit=30000){
+  if(typeof input!=='string'||input.length>limit)throw Error('回答の文字数が上限を超えています（'+limit+'文字）');
   let text=input.trim();if(!text)throw Error('回答が空です。ChatGPTの回答を貼り付けてください');
   let value,notes=[];
   // Only Markdown escapes on structural brackets, outside ordinary JSON strings.
@@ -42,12 +42,16 @@
     else if(c==='}'&&depth&&--depth===0)spans.push(text.slice(start,i+1));
    }
    const candidates=[];
-   for(const span of spans){try{const v=strict(span);if(v&&Object.hasOwn(v,'questions'))candidates.push(v)}catch(err){if(!(err instanceof SyntaxError))throw err}}
-   if(candidates.length>1)throw Error('questionsを含むJSONが複数あります。保存する回答1つだけを貼り付けてください');
+   for(const span of spans){try{const v=strict(span);if(v&&roots.some(key=>Object.hasOwn(v,key)))candidates.push(v)}catch(err){if(!(err instanceof SyntaxError))throw err}}
+   if(candidates.length>1)throw Error('対象形式のJSONが複数あります。保存する回答1つだけを貼り付けてください');
    if(candidates.length!==1||depth)throw Error(/[“”]/.test(text)?'曲がった引用符（“ ”）などでJSONが崩れています。引用符を一括置換せず、ChatGPTのコードブロックのコピーボタンでコピーし直してください。': 'JSONを読み取れません。途中切れ・エスケープ・DIL等の表示用表記を確認し、ChatGPTに同じ内容をJSONコードブロックで再出力させてコピーしてください。');
    value=candidates[0];notes.push('JSON外の前後文・コードフェンスを除外しました');
   }
   for(let n=0;typeof value==='string'&&n<2;n++){value=strict(value);notes.push('JSON文字列のエスケープを1層復号しました')}
+  return {value,notes};
+ }
+ function parse(input){
+  const {value,notes}=extract(input);
   if(!value||Array.isArray(value)||typeof value!=='object'||!Array.isArray(value.questions)||value.questions.length!==3)throw Error('questionsに厳密に3問が必要です');
   if(Object.keys(value).some(k=>k!=='questions'))throw Error('ルートの項目はquestionsだけにしてください');
   const keys=['statement','answer','explanation','reference','trap'];
@@ -58,5 +62,5 @@
   });
   return {questions:value.questions,notes};
  }
- root.LoopQPastedJSON=Object.freeze({parse});
+ root.LoopQPastedJSON=Object.freeze({parse,extract});
 })(globalThis);

@@ -8,6 +8,7 @@ const date=s=>{try{return new Intl.DateTimeFormat('ja-JP',{year:'numeric',month:
 const uid=()=>globalThis.crypto?.randomUUID?.()??`${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const statDefault=()=>({answered:0,correct:0,updatedAt:null});
 let db,records=[],route='home',filter='all',quiz=null,chosenFile=null,uploadPreview=null,saving=false,toastTimer;
+let capturePhotos=[],captureLoading=false;
 let libraryPage=0;const removedPhotos=new Map(),photoBusy=new Set();
 let settings=Object.assign({exam:EXAMS[0]},JSON.parse(localStorage.getItem(SETTING)||'{}'));
 // ChatGPT plan-sharing only: until SIWC approval, generation stays disabled. No owner-billed API fallback.
@@ -21,7 +22,7 @@ function isWeakQuestion(q,r){return !q.mastered && (q.weak === true || (q.attemp
 function isGraduated(q){return q.mastered===true}
 function getStats(){const qs=records.flatMap(r=>r.questions||[]);const answers=qs.reduce((a,q)=>a+(q.attempts||0),0),correct=qs.reduce((a,q)=>a+(q.correct||0),0);return {sources:records.length,questions:qs.length,answers,correct,accuracy:answers?Math.round(correct/answers*100):0,weak:records.reduce((n,r)=>n+(r.questions||[]).filter(q=>isWeakQuestion(q,r)).length,0),mastered:qs.filter(isGraduated).length}}
 const sTitles={home:'ホーム',capture:'問題を追加',library:'マイ問題集',review:'苦手を復習',settings:'設定',detail:'問題セット',quiz:'復習セッション',manual:'手動で問題登録'};
-function frame(inner){el.innerHTML=`<div class="content">${inner}</div>`;document.getElementById('crumb').textContent=sTitles[route]||'ホーム';document.querySelectorAll('[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===route));document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.go)));}
+function frame(inner){document.getElementById('app').scrollTop=0;el.innerHTML=`<div class="content">${inner}</div>`;document.getElementById('crumb').textContent=sTitles[route]||'ホーム';document.querySelectorAll('[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===route));document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.go)));}
 function navigate(to,params){route=to;quiz=to==='quiz'?params:quiz;const hash=to==='detail'?`detail/${params}`:to;if(location.hash!=='#'+hash)history.pushState(null,'','#'+hash);render();document.getElementById('app').scrollTop=0}
 function updateUrl(){const k=decodeURIComponent(location.hash.replace(/^#/,''));if(k.startsWith('detail/')){route='detail';return k.split('/')[1]}if(['home','capture','library','review','settings','quiz','manual'].includes(k))route=k;return null}
 function render(){const detailId=updateUrl();if(route==='home')return home();if(route==='capture')return capture();if(route==='library')return library();if(route==='review')return review();if(route==='settings')return preferences();if(route==='manual')return manual();if(route==='detail')return detail(detailId);if(route==='quiz')return quizPage();return home()}
@@ -39,29 +40,108 @@ function home(){const stats=getStats();const available=records.filter(r=>(r.ques
  <div class="home-progress-head"><strong>学習の進み具合</strong><span>習得 ${stats.mastered} / ${stats.questions}問</span></div>
  <div class="loopq-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="${stats.questions}" aria-valuenow="${stats.mastered}"><span style="width:${stats.questions?Math.round(stats.mastered/stats.questions*100):0}%"></span></div>
  <div class="home-progress-summary"><span>卒業済み <b>${stats.mastered}</b></span><span>苦手 <b>${stats.weak}</b></span><button class="btn sm ghost" data-go="library">問題集を見る →</button></div>
+ ${pendingSources().length?'<button class="btn teal resume-batch" id="resume-batch">未作成の写真から類題を作る（'+pendingSources().length+'枚）</button>':''}
  ${!available.length?'<p class="smalltext">まだ類題がありません。まず「問題を追加」から始めましょう。</p>':''}
 `);
 document.getElementById('home-weak').onclick=()=>startQuiz(weak,true);
-document.getElementById('home-all').onclick=()=>startQuiz(available,false);
+document.getElementById('home-all').onclick=()=>startQuiz(available,false);document.getElementById('resume-batch')?.addEventListener('click',()=>renderBatchHandoff(pendingSources()));
 }
 function listRow(r){return `<div class="list-row"><span class="list-icon">${r.image?'▧':'✎'}</span><div class="list-text"><strong>${escape(r.title)}</strong><small>${escape(r.exam)} · ${date(r.createdAt)} · ${(r.questions||[]).length}問</small></div><button class="btn sm ghost" data-detail="${escape(r.id)}">開く</button></div>`}
 function wireDetailButtons(){document.querySelectorAll('[data-detail]').forEach(x=>x.onclick=()=>navigate('detail',x.dataset.detail))}
+function pendingSources(){return (Array.isArray(settings.pendingSourceIds)?settings.pendingSourceIds.slice(0,5):[]).map(id=>records.find(r=>r.id===id&&!r.questions.length)).filter(Boolean)}
+async function acceptCommitted(rows){const ids=new Set(rows.map(r=>r.id));records=[...records.filter(r=>!ids.has(r.id)),...rows];try{await refresh()}catch{message('保存は完了しました。表示の再読込に失敗したため、必要ならホームを開き直してください')}return rows}
+async function persistPhotos(rows){return acceptCommitted(await LoopQBatch.commit(db,STORE,rows,'new'))}
+async function persistQuestions(sets){const rows=sets.map(set=>({id:set.sourceId,questions:set.questions.map(q=>({...q,id:uid(),attempts:0,correct:0,weak:false}))}));return acceptCommitted(await LoopQBatch.commit(db,STORE,rows,'questions'))}
 function capture(){
- frame(`<h1 class="page-title">元問題を追加</h1><div class="card capture-card"><div class="field"><label for="exam">試験・資格</label><select id="exam">${EXAMS.map(x=>`<option ${x===settings.exam?'selected':''}>${escape(x)}</option>`).join('')}</select></div><details class="custom-exam" id="custom-exam-options" ${EXAMS.includes(settings.exam)?'':'open'}><summary>一覧にない資格を入力</summary><div class="field"><label for="custom-exam">一覧にない場合は、資格名を入力してください</label><input id="custom-exam" maxlength="60" placeholder="資格名（任意）" value="${EXAMS.includes(settings.exam)?'':escape(settings.exam)}"></div></details><label class="drop" for="photo-input"><div id="photo-area"><strong>写真を撮る・選ぶ</strong></div><input id="photo-input" type="file" accept="image/*" hidden></label><button class="btn primary" id="save-source">類題を3問作る</button><p class="smalltext">写真を端末内に保存し、ChatGPTで作る手順へ進みます。</p><p id="capture-status" class="smalltext" role="status"></p><button class="btn ghost sm" data-go="manual">手動で問題を登録</button></div>`);
- const area=document.getElementById('photo-area'),input=document.getElementById('photo-input'),btn=document.getElementById('save-source'),status=document.getElementById('capture-status');
- let loading=false,photoRequest=0;
- document.getElementById('exam').onchange=()=>{if(document.getElementById('exam').value==='その他')document.getElementById('custom-exam-options').open=true};
- const showPhoto=()=>{area.replaceChildren();const img=document.createElement('img');img.src=LoopQSafety.safeImage(uploadPreview);img.alt='選択した元問題';img.className='capture-photo';area.append(img)};
- if(uploadPreview)showPhoto();
- input.addEventListener('change',async()=>{if(!input.files?.[0])return;const request=++photoRequest;loading=true;btn.disabled=true;status.textContent='写真を読み込み中…';try{const file=input.files[0],preview=await processImage(file);if(request!==photoRequest)return;chosenFile=file;uploadPreview=preview;showPhoto();status.textContent=''}catch(e){if(request===photoRequest)status.textContent='画像を読み込めません：'+e.message}finally{if(request===photoRequest){loading=false;btn.disabled=false}}});
+ frame(`<h1 class="page-title">元問題を追加</h1><div class="card capture-card"><div class="field"><label for="exam">試験・資格</label><select id="exam">${EXAMS.map(x=>`<option ${x===settings.exam?'selected':''}>${escape(x)}</option>`).join('')}</select></div><details class="custom-exam" id="custom-exam-options" ${EXAMS.includes(settings.exam)?'':'open'}><summary>一覧にない資格を入力</summary><div class="field"><label for="custom-exam">資格名</label><input id="custom-exam" maxlength="60" value="${EXAMS.includes(settings.exam)?'':escape(settings.exam)}"></div></details><div class="photo-choices"><label class="btn teal" for="capture-camera">写真を撮る</label><label class="btn ghost" for="photo-input">写真を選ぶ（複数可）</label><input id="capture-camera" type="file" accept="image/*" capture="environment" hidden><input id="photo-input" type="file" accept="image/*" multiple hidden></div><div id="photo-area" class="capture-strip" aria-label="追加する写真"></div><p class="smalltext" id="capture-count"></p><p class="smalltext">最大5枚。写真ごとに3問をまとめて作れます。</p><p class="smalltext" id="capture-status" role="status"></p><div class="flow-actions"><button class="btn ghost" data-go="home">ホーム</button><button class="btn primary" id="save-source">まとめて類題を作る</button></div><button class="btn ghost sm" data-go="manual">手動で問題を登録</button></div>`);
+ const area=document.getElementById('photo-area'),btn=document.getElementById('save-source'),status=document.getElementById('capture-status');
+ document.getElementById('exam').onchange=()=>{const other=document.getElementById('exam').value==='その他';document.getElementById('custom-exam-options').open=other;if(!other)document.getElementById('custom-exam').value=''};
+ const draw=()=>{
+  area.replaceChildren();capturePhotos.forEach((photo,i)=>{const box=document.createElement('div');box.className='capture-tile';const img=document.createElement('img');img.src=LoopQSafety.safeImage(photo.image);img.alt='写真'+(i+1);const removeButton=document.createElement('button');removeButton.className='btn ghost sm';removeButton.textContent=(i+1)+'枚目を外す';removeButton.disabled=captureLoading||saving;removeButton.onclick=()=>{if(captureLoading||saving)return;capturePhotos.splice(i,1);draw()};box.append(img,removeButton);area.append(box)});
+  document.getElementById('capture-count').textContent=capturePhotos.length+'枚 → '+capturePhotos.length*3+'問';btn.textContent=capturePhotos.length===1?'類題を3問作る':'まとめて類題を作る';btn.disabled=captureLoading||saving;
+ };
+ const add=async input=>{
+  const files=Array.from(input.files||[]);input.value='';if(!files.length)return;
+  if(captureLoading||saving){status.textContent='読み込みが終わってから追加してください';return}
+  if(capturePhotos.length+files.length>LoopQBatch.MAX_PHOTOS){status.textContent='一度に追加できる写真は5枚までです';return}
+  captureLoading=true;draw();status.textContent='写真を読み込み中…';
+  try{
+   const staged=[];for(const file of files){const image=await processImage(file);staged.push({image});if([...capturePhotos,...staged].reduce((n,p)=>n+p.image.length,0)>LoopQBatch.MAX_IMAGE_CHARS)throw Error('画像の合計サイズが大きすぎます。枚数を減らしてください')}
+   capturePhotos.push(...staged);status.textContent='';
+  }catch(e){status.textContent='追加できません：'+e.message+'。今回選んだ写真は追加していません'}finally{captureLoading=false;if(document.getElementById('save-source')===btn)draw()}
+ };
+ document.getElementById('photo-input').addEventListener('change',e=>add(e.target));document.getElementById('capture-camera').addEventListener('change',e=>add(e.target));draw();
  btn.onclick=async()=>{
-  if(saving||loading)return;
-  if(!uploadPreview){status.textContent='元問題の写真を選んでください';return}
+  if(saving||captureLoading)return;
+  if(!capturePhotos.length){status.textContent='元問題の写真を追加してください';return}
   const exam=document.getElementById('custom-exam').value.trim()||document.getElementById('exam').value;
-  if(exam==='その他'){status.textContent='資格名を入力してください';return}
-  saving=true;btn.disabled=true;status.textContent='保存中…';
-  const r={id:uid(),title:'元問題 '+new Intl.DateTimeFormat('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date()),exam,topic:'',image:uploadPreview,questions:[],weak:false,createdAt:new Date().toISOString(),status:'saved'};
-  try{await persist(r);settings.exam=exam;try{saveSettings()}catch{}chosenFile=null;uploadPreview=null;navigate('detail',r.id);renderHandoff(r)}catch(e){status.textContent='保存できません：'+e.message;btn.disabled=false}finally{saving=false}
+  if(!exam||exam==='その他'){status.textContent='資格名を入力してください';return}
+  saving=true;draw();status.textContent='写真をまとめて保存中…';
+  const now=new Date(),label=new Intl.DateTimeFormat('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}).format(now);
+  const rows=capturePhotos.map((photo,i)=>({id:uid(),title:'元問題 '+label+(capturePhotos.length>1?'（'+(i+1)+'枚目）':''),exam,topic:'',image:photo.image,questions:[],weak:false,createdAt:now.toISOString(),status:'saved'}));
+  try{
+   const saved=await persistPhotos(rows);settings.exam=exam;settings.pendingSourceIds=saved.map(r=>r.id);try{saveSettings()}catch{}
+   capturePhotos=[];if(document.getElementById('save-source')===btn){navigate('detail',saved[0].id);renderBatchHandoff(saved)}else message('写真を保存しました。ホームから作成を再開できます');
+  }catch(e){status.textContent='保存できません：'+e.message+'。写真は追加欄に残しています'}finally{saving=false;if(document.getElementById('save-source')===btn)draw()}
+ };
+}
+
+function renderHandoff(r){const pending=pendingSources();renderBatchHandoff(pending.some(x=>x.id===r.id)?pending:[r])}
+function batchPrompt(sources){
+ const sample={statement:'具体的な条件を含む問題文',answer:true,explanation:'正誤の理由',reference:'実際に確認した一次資料・条文・適用時点。未確認なら未確認',trap:'要点'};
+ const output=sources.length===1?{questions:[sample,{...sample,answer:false},sample]}:{sets:sources.map(r=>({sourceId:r.id,questions:[sample,{...sample,answer:false},sample]}))};
+ return `あなたは資格試験の応用問題を作る作問者です。添付されたまとめ画像には、ID付きの元問題写真が${sources.length}枚あります。各写真を独立した出題元として、写真ごとに厳密に3問、合計${sources.length*3}問の新しい○×問題を作ってください。
+対象写真：
+${sources.map((r,i)=>`${i+1}枚目：sourceId=${r.id}／資格=${r.exam}${r.topic?'／メモ='+r.topic:''}`).join('\n')}
+まとめ画像に表示された写真IDと回答のsourceIdを一致させてください。IDの取り違え・写真間の論点混在は不可。画像の不足、読み取り不能、ID不明があれば推測で埋めず、回答JSONを生成せず再添付を求めてください。
+元の文章・選択肢・固有の事例・配置を再利用せず、独立した別の事例を作成してください。難しさは元問題以上とし、各問に当事者・時期・数値・例外等の複数条件を含め、定義確認で水増ししないでください。
+法律系は試験年度と法令基準日を確認してください。未指定なら適用時点を明示し、特定年度向けの確認済みとはしないでください。法令・公的な一次資料で実際に確認した根拠のみ記載し、未確認は未確認と明記してください。各正答を独立に再検証し、疑問があれば作り直してください。
+出力は次のスキーマのJSONオブジェクトだけ。キー・sourceIdは変更せず、answerはtrue/false、他の4項目は文字列。各写真のquestionsは厳密に3問です。Markdownや前後文は付けないでください。
+${JSON.stringify(output)}`;
+}
+async function prepareShareImage(sources){
+ const load=src=>new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(Error('共有用の写真を読み込めません'));img.src=LoopQSafety.safeImage(src)});
+ const dims=[];
+ for(const r of sources){if(!r.image)throw Error('元画像のない写真があります。元写真をChatGPTへ手動で添付してください');const img=await load(r.image);const scale=Math.min(1,1600/img.naturalWidth);dims.push({w:Math.round(img.naturalWidth*scale),h:Math.round(img.naturalHeight*scale)});img.src=''}
+ const width=Math.max(800,...dims.map(d=>d.w)),height=dims.reduce((n,d)=>n+d.h+70,0);
+ if(width*height>20_000_000)throw Error('まとめ画像が大きすぎます。枚数を減らしてください');
+ const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;const ctx=canvas.getContext('2d');if(!ctx)throw Error('この端末ではまとめ画像を作れません');ctx.fillStyle='#fff';ctx.fillRect(0,0,width,height);let y=0;
+ for(let i=0;i<sources.length;i++){ctx.fillStyle='#102c40';ctx.font='24px sans-serif';ctx.fillText('写真 '+(i+1)+' / ID '+sources[i].id,18,y+44,width-36);y+=70;const img=await load(sources[i].image);ctx.drawImage(img,0,y,dims[i].w,dims[i].h);img.src='';y+=dims[i].h}
+ const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.94));canvas.width=canvas.height=1;if(!blob)throw Error('共有画像を作れません');return new File([blob],'loopq-'+sources.length+'-photos.jpg',{type:'image/jpeg'});
+}
+function renderBatchHandoff(sources){
+ if(!sources.length||sources.length>LoopQBatch.MAX_PHOTOS){message('写真は1〜5枚で指定してください');return}
+ const ids=sources.map(r=>r.id),prompt=batchPrompt(sources);
+ frame(`<div class="page-heading"><h1 class="page-title">${sources.length}枚から${sources.length*3}問を作る</h1></div><div class="card batch-flow" id="batch-flow"><p class="smalltext">① 写真と指示文をChatGPTへ共有 → ② 回答をここに貼り付け</p><button id="share-batch" class="btn teal" disabled>共有画像を準備中…</button><details id="batch-fallback" class="details" ${typeof navigator.share==='function'?'':'open'}><summary>共有できない・指示文が渡らない場合</summary><div class="button-group"><button id="copy-prompt" class="btn ghost">指示文をコピー</button><button id="export-batch" class="btn ghost" disabled>写真まとめを保存</button><a class="btn ghost" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPTを開く</a></div><p class="smalltext">保存したまとめ画像を添付し、指示文を貼って送信してください。</p><details><summary>指示文</summary><textarea id="handoff-prompt" rows="3" readonly></textarea></details></details><p class="smalltext" id="share-feedback" role="status">写真は自動送信されません。共有先で写真と指示文を確認してください。</p><div class="field"><label for="generated-json">ChatGPTの回答</label><textarea id="generated-json" rows="3" maxlength="150000" placeholder="回答全体を貼り付け"></textarea></div><button id="paste-json" class="btn ghost sm">クリップボードから貼り付け</button><p id="handoff-feedback" class="smalltext" role="status" aria-live="polite"></p><details class="details" id="batch-preview"><summary id="batch-preview-title">写真との対応・内容を見る</summary><div id="json-preview"></div></details><label class="toggle-line"><input id="manual-review-ok" type="checkbox"><span>写真との対応を確認し、AIの未検証の問題として保存・演習します。</span></label><div class="flow-actions"><button class="btn ghost" data-go="home">ホーム</button><button class="btn primary" id="accept-json" disabled>保存して解く</button></div></div>`);
+ const panel=document.getElementById('batch-flow'),input=document.getElementById('generated-json'),accept=document.getElementById('accept-json'),review=document.getElementById('manual-review-ok'),feedback=document.getElementById('handoff-feedback'),shareInfo=document.getElementById('share-feedback'),fallback=document.getElementById('batch-fallback');let parsed=null,checkedText=null,busy=false,shareFile=null,shareBusy=false;
+ document.getElementById('handoff-prompt').value=prompt;
+ const enabled=()=>{accept.disabled=busy||!parsed||!review.checked};
+ function inspect(){
+  parsed=null;checkedText=null;review.checked=false;const preview=document.getElementById('json-preview');preview.replaceChildren();
+  try{parsed=LoopQBatch.parse(input.value,ids);checkedText=input.value;feedback.textContent=sources.length+'枚・'+sources.length*3+'問を読み取れました。'+parsed.notes.join('。');document.getElementById('batch-preview-title').textContent='写真との対応・全'+sources.length*3+'問を確認';
+   parsed.sets.forEach((set,i)=>{const box=document.createElement('section'),label=document.createElement('strong');label.textContent='写真'+(i+1)+' / '+set.sourceId;box.append(label);if(sources[i].image){const img=document.createElement('img');img.src=LoopQSafety.safeImage(sources[i].image);img.className='batch-source-thumb';img.alt='写真'+(i+1);box.append(img)}for(const [n,q] of set.questions.entries()){const text=document.createElement('p');text.className='batch-question';text.textContent=(n+1)+'. '+q.statement+'\n正しい答え：'+(q.answer?'○':'×')+'\n解説：'+q.explanation+'\n出典：'+q.reference+'\n要点：'+q.trap;box.append(text)}preview.append(box)});
+  }catch(e){feedback.textContent=input.value?'保存できません：'+e.message+'（学習履歴は変更していません）':''}enabled();
+ }
+ input.addEventListener('input',inspect);review.onchange=enabled;
+ document.getElementById('paste-json').onclick=async()=>{try{const text=await navigator.clipboard.readText();if(document.getElementById('batch-flow')!==panel)return;input.value=text;inspect()}catch{if(document.getElementById('batch-flow')!==panel)return;feedback.textContent='自動貼り付けが使えません。回答欄を長押しして貼り付けてください';input.focus()}};
+ document.getElementById('copy-prompt').onclick=async()=>{try{await navigator.clipboard.writeText(prompt);shareInfo.textContent='指示文をコピーしました。写真まとめと一緒にChatGPTへ送ってください'}catch{fallback.open=true;const field=document.getElementById('handoff-prompt');field.select();shareInfo.textContent='指示文を選択しました。手動でコピーしてください'}};
+ prepareShareImage(sources).then(file=>{if(document.getElementById('batch-flow')!==panel)return;shareFile=file;document.getElementById('export-batch').disabled=false;const button=document.getElementById('share-batch');button.disabled=false;button.textContent='写真と指示文を共有'}).catch(e=>{if(document.getElementById('batch-flow')!==panel)return;document.getElementById('share-batch').textContent='共有画像を準備できません';fallback.open=true;shareInfo.textContent=e.message});
+ document.getElementById('share-batch').onclick=()=>{
+  if(!shareFile||shareBusy)return;
+  if(typeof navigator.share!=='function'||(navigator.canShare&&!navigator.canShare({files:[shareFile]}))){fallback.open=true;shareInfo.textContent='この端末ではまとめ共有に対応していません。指示文コピーと写真まとめ保存を使ってください';return}
+  shareBusy=true;
+  try{navigator.share({files:[shareFile],text:prompt,title:'LoopQ '+sources.length+'枚の元問題'}).then(()=>{shareInfo.textContent='ChatGPTで写真と指示文が届いたことを確認してください。回答をコピーしてこの欄に貼ると、まとめて保存できます'}).catch(e=>{if(e.name!=='AbortError'){fallback.open=true;shareInfo.textContent='共有できません：'+e.message}}).finally(()=>shareBusy=false)}catch(e){shareBusy=false;fallback.open=true;shareInfo.textContent='共有できません：'+e.message}
+ };
+ document.getElementById('export-batch').onclick=()=>{if(!shareFile)return;const url=URL.createObjectURL(shareFile),a=document.createElement('a');a.href=url;a.download=shareFile.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);shareInfo.textContent='写真まとめの保存を開始しました。ChatGPTに添付してください'};
+ accept.onclick=async()=>{
+  if(busy)return;
+  if(!parsed||checkedText!==input.value||!review.checked){feedback.textContent='回答を貼り付け、写真との対応を確認してください';return}
+  busy=true;enabled();input.disabled=review.disabled=true;
+  try{
+   const verified=LoopQBatch.parse(input.value,ids),saved=await persistQuestions(verified.sets);
+   settings.pendingSourceIds=(Array.isArray(settings.pendingSourceIds)?settings.pendingSourceIds:[]).filter(id=>!ids.includes(id));try{saveSettings()}catch{}
+   if(document.getElementById('batch-flow')===panel)startQuiz(saved);else message(saved.length*3+'問を保存しました。ホームから復習できます');
+  }catch(e){feedback.textContent='一括保存できません：'+e.message+'。既存の類題・学習履歴は変更していません'}finally{busy=false;input.disabled=review.disabled=false;enabled()}
  };
 }
 
@@ -108,56 +188,6 @@ function photoAsFile(src, id){
  const ext=m[1]==='jpeg'?'jpg':m[1];
  return new File([out],`loopq-question-${id}.${ext}`,{type:`image/${m[1]}`});
 }
-function renderHandoff(r){
- frame('<h1 class="page-title">類題を3問作る</h1><div id="handoff-panel"></div>');
- const panel=document.getElementById('handoff-panel');
- panel.innerHTML=`<section class="ai-local-card" id="ai-local-card" hidden></section><div class="handoff-card"><div class="page-heading"><strong id="handoff-step-title">1 / 3　ChatGPTへ送る</strong><button class="btn ghost sm" id="close-handoff">セットへ</button></div><section id="handoff-send"><p class="smalltext">指示文と写真をChatGPTへ送ってください。自動送信はしません。</p><button class="btn primary" id="copy-prompt">指示文をコピー</button><div class="button-group">${r.image?'<button class="btn teal" id="share-photo">写真を共有</button><button class="btn ghost" id="export-photo">写真を保存</button>':'<p class="smalltext">元画像がありません。ChatGPTに元の写真を添付してください。</p>'}<a class="btn ghost" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPTを開く ↗</a></div><details class="details"><summary>指示文を確認・編集</summary><label class="sr-only" for="handoff-prompt">作問指示文</label><textarea id="handoff-prompt" class="code-input" rows="4"></textarea></details><button class="btn primary" id="handoff-to-input">回答を貼り付ける →</button></section><section id="handoff-input" hidden><div class="field"><label for="generated-json">ChatGPTの回答を貼り付け</label><textarea id="generated-json" class="code-input" rows="5" maxlength="30000"></textarea></div><div class="button-group"><button class="btn ghost" id="handoff-to-send">戻る</button><button class="btn primary" id="preview-json">3問を確認 →</button></div></section><section id="handoff-review" hidden><div id="json-preview" aria-live="polite"></div><div class="page-controls"><button class="btn ghost sm" id="preview-prev">前の問題</button><span id="preview-count"></span><button class="btn ghost sm" id="preview-next">次の問題</button></div><label class="toggle-line"><input type="checkbox" id="manual-review-ok"><span>3問の正答・解説・法令の適用時期を確認しました。出典は未検証として保存します。</span></label><div class="button-group"><button class="btn ghost" id="handoff-edit">入力に戻る</button><button class="btn primary" id="accept-json">3問を保存</button></div></section><p id="handoff-feedback" class="smalltext" role="status" aria-live="polite"></p></div>`;
- const showStep=n=>{['send','input','review'].forEach((key,i)=>document.getElementById('handoff-'+key).hidden=i!==n);document.getElementById('handoff-step-title').textContent=['1 / 3　ChatGPTへ送る','2 / 3　回答を貼り付け','3 / 3　内容を確認'][n];document.getElementById('app').scrollTop=0};
- document.getElementById('handoff-to-input').onclick=()=>showStep(1);document.getElementById('handoff-to-send').onclick=()=>showStep(0);document.getElementById('handoff-edit').onclick=()=>showStep(1);document.getElementById('close-handoff').onclick=()=>detail(r.id);
- setupLocalAI(panel,r);
- document.getElementById('handoff-prompt').value=handoffPrompt(r);
- document.getElementById('copy-prompt').onclick=async()=>{const value=document.getElementById('handoff-prompt').value;try{await navigator.clipboard.writeText(value);message('指示文をコピーしました。次は写真をChatGPTに添付してください。')}catch{document.getElementById('handoff-prompt').select();message('自動コピーできません。選択された指示文を手動でコピーしてください')}};
- document.getElementById('share-photo')?.addEventListener('click',()=>{
-   const feedback=document.getElementById('handoff-feedback');
-   try{
-     const file=photoAsFile(r.image,r.id);
-     if(typeof navigator.share==='function'&&(!navigator.canShare||navigator.canShare({files:[file]}))){
-       // Must invoke share() directly from a user gesture, without awaiting clipboard or async conversion.
-       navigator.share({files:[file],title:'LoopQの学習問題'}).then(()=>{feedback.textContent='共有した写真がChatGPTに表示されていることを確認し、コピーした指示文を貼って送信してください。'}).catch(e=>{if(e.name!=='AbortError')feedback.textContent='共有できませんでした。「添付用の写真を保存」を使ってください。'});
-     } else feedback.textContent='この端末では写真の共有に対応していません。「添付用の写真を保存」からChatGPTで添付してください。';
-   }catch(e){feedback.textContent='写真を共有できません：'+e.message}
- });
- document.getElementById('export-photo')?.addEventListener('click',()=>{const src=LoopQSafety.safeImage(r.image);if(!src){message('保存画像が見つかりません');return}const a=document.createElement('a');a.href=src;a.download='loopq-question-'+r.id+'.jpg';document.body.appendChild(a);a.click();a.remove();message('写真の保存を試みました。写真・ファイルアプリを確認してください。')});
- const input=document.getElementById('generated-json'),preview=document.getElementById('json-preview'),accept=document.getElementById('accept-json');
- let checkedText=null,busy=false,previewQuestions=[],previewIndex=0;const viewed=new Set();
- function drawPreview(){preview.replaceChildren();const q=previewQuestions[previewIndex],box=document.createElement('section');box.className='preview-question';box.tabIndex=0;box.textContent=q.statement+'\n正しい答え：'+(q.answer?'○':'×')+'\n解説：'+q.explanation+'\n出典：'+q.reference+'\n要点：'+q.trap;preview.append(box);viewed.add(previewIndex);document.getElementById('preview-count').textContent=(previewIndex+1)+' / 3';document.getElementById('preview-prev').disabled=previewIndex===0;document.getElementById('preview-next').disabled=previewIndex===2;accept.disabled=viewed.size!==3}
- document.getElementById('preview-prev').onclick=()=>{if(previewIndex>0){previewIndex--;drawPreview()}};document.getElementById('preview-next').onclick=()=>{if(previewIndex<2){previewIndex++;drawPreview()}};
- accept.disabled=true;
- input.addEventListener('input',()=>{checkedText=null;accept.disabled=true;preview.textContent='入力が変わりました。もう一度プレビューしてください';document.getElementById('manual-review-ok').checked=false});
- document.getElementById('preview-json').onclick=()=>{
-  checkedText=null;accept.disabled=true;preview.replaceChildren();
-  try{
-   const parsed=LoopQPastedJSON.parse(input.value);
-   previewQuestions=parsed.questions;previewIndex=0;viewed.clear();document.getElementById('manual-review-ok').checked=false;checkedText=input.value;document.getElementById('handoff-feedback').textContent=parsed.notes.join('。');showStep(2);drawPreview();
-  }catch(e){document.getElementById('handoff-feedback').textContent='確認できません：'+e.message+'（入力と学習履歴は変更していません）'}
- };
- accept.onclick=async()=>{
-  const feedback=document.getElementById('handoff-feedback');
-  if(busy)return;
-  if(checkedText===null||checkedText!==input.value||viewed.size!==3){feedback.textContent='先に現在の入力をプレビューしてください';return}
-  if(!document.getElementById('manual-review-ok').checked){feedback.textContent='プレビューと正答・解説を確認し、チェックしてください';return}
-  try{
-   const newQs=cleanPastedQuestions(input.value);
-   if(r.questions.length)throw Error('既存の類題と学習履歴があるため置き換えません。新しいセットに保存してください');
-   busy=true;accept.disabled=true;
-   const updated={...r,questions:newQs,status:'review_required'};
-   await persist(updated);message('3問を保存しました（出典は未検証です）');detail(r.id);
-  }catch(e){feedback.textContent='保存できません：'+e.message}finally{busy=false;accept.disabled=false}
- };
- document.getElementById('app').scrollTop=0;
-}
-
-
 async function setupLocalAI(panel, r){
   const target=panel.querySelector('#ai-local-card');
   if(!target||!window.LoopQAI?.enabled)return;
@@ -202,33 +232,34 @@ function wireReviewButtons(){document.querySelectorAll('[data-review]').forEach(
 function review(){const stats=getStats(),available=records.filter(r=>r.questions?.length),weak=available.filter(r=>r.questions.some(q=>isWeakQuestion(q,r)));frame(`<h1 class="page-title">復習</h1><p class="smalltext">解答 ${stats.answers}回 · 正答率 ${stats.accuracy}%</p><div class="review-actions"><button class="btn primary" id="weak-review" ${weak.length?'':'disabled'}>苦手に挑戦（${stats.weak}問）</button><button class="btn ghost" id="all-review" ${available.length?'':'disabled'}>総復習（${stats.questions}問）</button></div>${available.length?'':'<p class="smalltext">先に元問題を追加して、類題を作ってください。</p>'}`);document.getElementById('weak-review').onclick=()=>startQuiz(weak,true);document.getElementById('all-review').onclick=()=>startQuiz(available)}
 
 function startQuiz(sets,weakOnly=false){let pool=sets.flatMap(r=>r.questions.filter(q=>!weakOnly||isWeakQuestion(q,r)).map(q=>({setId:r.id,qid:q.id})));if(!pool.length){message('復習できる問題がありません');return}pool=pool.sort(()=>Math.random()-.5);quiz={pool,index:0,picked:null,sessionCorrect:0};navigate('quiz',quiz)}
+function resultDock(picked,last){const home='<button class="btn ghost" data-go="home">ホーム</button>',next=`<button id="next" class="btn primary">${last?'終了してホーム':'次の問題 →'}</button>`;return '<div class="thumb-dock">'+(picked?next+home:home+next)+'</div>'}
 function quizPage(){
  if(!quiz?.pool?.length){navigate('review');return}const cur=quiz.pool[quiz.index],r=records.find(x=>x.id===cur.setId),q=r?.questions.find(x=>x.id===cur.qid);if(!q){navigate('review');return}const done=quiz.picked!==null;
- frame(`<div class="quiz-shell"><div class="quiz-head"><strong>問題 ${quiz.index+1} / ${quiz.pool.length}</strong><button id="quit" class="btn ghost sm">終了</button></div><div class="card quiz-card">${done?`<div class="answer-result ${quiz.picked===q.answer?'result-correct':'result-wrong'}" role="status">${quiz.picked===q.answer?'正解':'不正解'}</div><div class="answer-summary"><span>あなたの回答：${quiz.picked?'○':'×'}</span><span>正しい答え：${q.answer?'○':'×'}</span></div><div class="segmented"><button id="show-explanation" class="btn primary sm">解説</button><button id="show-question" class="btn ghost sm">問題文</button></div><div class="quiz-reading" tabindex="0" id="quiz-explanation"><p>${escape(q.explanation)}</p>${q.trap?`<p><b>要点：</b>${escape(q.trap)}</p>`:''}${q.reference?`<p class="smalltext">出典：${escape(q.reference)}</p>`:''}</div><div class="quiz-reading" tabindex="0" id="quiz-question" hidden><p class="question">${escape(q.statement)}</p></div><div class="button-group quiz-actions"><button id="mark-weak" class="btn ghost sm">${q.weak?'苦手登録を解除':'苦手に登録'}</button><button id="next" class="btn primary">${quiz.index===quiz.pool.length-1?'結果を見る':'次の問題 →'}</button></div>`:`<p class="smalltext">${escape(r.exam)}</p><div class="quiz-reading" tabindex="0"><p class="question">${escape(q.statement)}</p></div><div class="answer-grid"><button id="ans-true" class="answer-choice">○ 正しい</button><button id="ans-false" class="answer-choice">× 誤り</button></div>`}</div></div>`);
+ frame(`<div class="quiz-shell"><div class="quiz-head"><strong>問題 ${quiz.index+1} / ${quiz.pool.length}</strong><button id="quit" class="btn ghost sm">ホーム</button></div><div class="card quiz-card">${done?`<div class="answer-result ${quiz.picked===q.answer?'result-correct':'result-wrong'}" role="status">${quiz.picked===q.answer?'正解':'不正解'}</div><div class="answer-summary"><span>あなたの回答：${quiz.picked?'○':'×'}</span><span>正しい答え：${q.answer?'○':'×'}</span></div><div class="segmented"><button id="show-explanation" class="btn primary sm">解説</button><button id="show-question" class="btn ghost sm">問題文</button></div><div class="quiz-reading" tabindex="0" id="quiz-explanation"><p>${escape(q.explanation)}</p>${q.trap?`<p><b>要点：</b>${escape(q.trap)}</p>`:''}${q.reference?`<p class="smalltext">出典：${escape(q.reference)}</p>`:''}</div><div class="quiz-reading" tabindex="0" id="quiz-question" hidden><p class="question">${escape(q.statement)}</p></div><button id="mark-weak" class="btn ghost sm">${q.weak?'苦手登録を解除':'苦手に登録'}</button>${resultDock(quiz.picked,quiz.index===quiz.pool.length-1)}`:`<p class="smalltext">${escape(r.exam)}</p><div class="quiz-reading" tabindex="0"><p class="question">${escape(q.statement)}</p></div><div class="answer-grid thumb-dock"><button id="ans-true" class="answer-choice">○ 正しい</button><button id="ans-false" class="answer-choice">× 誤り</button></div>`}</div></div>`);
  if(!done){document.getElementById('ans-true').onclick=()=>answer(true);document.getElementById('ans-false').onclick=()=>answer(false)}else{
   const tab=question=>{document.getElementById('quiz-question').hidden=!question;document.getElementById('quiz-explanation').hidden=question;document.getElementById('show-question').className='btn sm '+(question?'primary':'ghost');document.getElementById('show-explanation').className='btn sm '+(question?'ghost':'primary')};document.getElementById('show-explanation').onclick=()=>tab(false);document.getElementById('show-question').onclick=()=>tab(true);
-  document.getElementById('mark-weak').onclick=async()=>{try{const questions=r.questions.map(item=>item.id===q.id?{...item,weak:!q.weak}:item);await persist({...r,questions});quizPage()}catch(e){message('保存できません：'+e.message)}};document.getElementById('next').onclick=()=>{quiz.index++;quiz.picked=null;if(quiz.index>=quiz.pool.length)results();else quizPage()}
- }document.getElementById('quit').onclick=()=>navigate('review');
+  document.getElementById('mark-weak').onclick=async()=>{try{const questions=r.questions.map(item=>item.id===q.id?{...item,weak:!q.weak}:item);await persist({...r,questions});quizPage()}catch(e){message('保存できません：'+e.message)}};document.getElementById('next').onclick=()=>{if(quiz.picked===null||quiz.saving)return;quiz.index++;quiz.picked=null;quiz.readyAt=Date.now()+300;if(quiz.index>=quiz.pool.length)results();else quizPage()}
+ }document.getElementById('quit').onclick=()=>navigate('home');
 }
 
 async function answer(value){
- if(quiz.picked!==null||quiz.saving)return;const session=quiz,c=session.pool[session.index],r=records.find(x=>x.id===c.setId),original=r.questions.find(x=>x.id===c.qid),q={...original};session.saving=true;
+ if(quiz.picked!==null||quiz.saving||Date.now()<(quiz.readyAt||0))return;const session=quiz,c=session.pool[session.index],r=records.find(x=>x.id===c.setId),original=r.questions.find(x=>x.id===c.qid),q={...original};session.saving=true;
  document.getElementById('ans-true').disabled=true;document.getElementById('ans-false').disabled=true;
  q.attempts=(q.attempts||0)+1;const today=new Date().toISOString().slice(0,10);
  if(value===q.answer){q.correct=(q.correct||0)+1;if(q.lastSuccessDay!==today){q.successDays=(q.successDays||0)+1;q.lastSuccessDay=today}if(q.successDays>=3){q.mastered=true;q.weak=false}}else{q.weak=true;q.mastered=false;q.successDays=0;q.lastSuccessDay=''}q.lastAnsweredAt=new Date().toISOString();
  try{await persist({...r,questions:r.questions.map(item=>item.id===q.id?q:item)});session.picked=value;if(value===q.answer)session.sessionCorrect++;if(quiz===session&&route==='quiz')quizPage()}catch(e){message('解答を保存できません：'+e.message);if(quiz===session&&route==='quiz')quizPage()}finally{session.saving=false}
 }
 
-function results(){const total=quiz.pool.length,correct=quiz.sessionCorrect;frame(`<div class="quiz-shell"><div class="card" style="text-align:center;padding:50px 24px"><h1 class="headline">復習結果</h1><div style="font-size:48px;color:var(--cyan);font-weight:900">${correct} / ${total}</div><p>正答率 ${Math.round(correct/total*100)}%</p><div class="button-group" style="justify-content:center"><button class="btn primary" data-go="review">もう一度復習</button><button class="btn ghost" data-go="library">問題集を見る</button></div></div></div>`);quiz=null;}
+function results(){const total=quiz.pool.length,correct=quiz.sessionCorrect;quiz=null;navigate('home');message('今回の結果：'+correct+' / '+total+'問正解')}
 function preferences(){
  frame(`<h1 class="page-title">設定</h1><div class="segmented"><button class="btn primary" id="settings-data">データ</button><button class="btn ghost" id="settings-about">このアプリについて</button></div><div class="card" id="data-pane"><h2>バックアップ</h2><p class="smalltext">画像・類題・学習履歴は、このブラウザ内に保存されます。写真アプリやドライブには自動保存されません。</p><p class="smalltext">サイトデータを削除すると消えます。必要なデータは書き出してください。</p><div class="button-group"><button id="export" class="btn primary">バックアップ保存</button><label class="btn ghost" for="import-file">復元する</label><input id="import-file" hidden type="file" accept="application/json,.json"></div><p class="smalltext">${records.length}セット / ${getStats().questions}問</p><button class="btn danger sm" id="erase">全データを削除</button></div><div class="card" id="about-pane" hidden><h2>LoopQ プレビュー版</h2><p>Web版の類題作成はChatGPTとの手動連携です。写真は自動送信されません。</p><p>AIの正答・法令・出典は、ご自身で一次資料を確認してください。</p><p class="smalltext">iPhone実機での検証は継続中です。</p></div>`);
  const tab=about=>{document.getElementById('data-pane').hidden=about;document.getElementById('about-pane').hidden=!about;document.getElementById('settings-data').className='btn '+(about?'ghost':'primary');document.getElementById('settings-about').className='btn '+(about?'primary':'ghost')};document.getElementById('settings-data').onclick=()=>tab(false);document.getElementById('settings-about').onclick=()=>tab(true);
- document.getElementById('export').onclick=backup;document.getElementById('import-file').onchange=importBackup;document.getElementById('erase').onclick=async()=>{if(!confirm('写真・全問題・解答履歴を完全に削除します。取り消せません。実行しますか？'))return;try{await tx('readwrite',s=>s.clear());removedPhotos.clear();await refresh();message('学習データを削除しました');preferences()}catch(e){message('削除できません：'+e.message)}};
+ document.getElementById('export').onclick=backup;document.getElementById('import-file').onchange=importBackup;document.getElementById('erase').onclick=async()=>{if(!confirm('写真・全問題・解答履歴を完全に削除します。取り消せません。実行しますか？'))return;try{await tx('readwrite',s=>s.clear());removedPhotos.clear();await refresh();message('学習データを削除しました');navigate('home')}catch(e){message('削除できません：'+e.message)}};
 }
 
 function saveSettings(){localStorage.setItem(SETTING,JSON.stringify(settings))}
 function backup(){const content={format:'loopq.v2',exportedAt:new Date().toISOString(),records};const blob=new Blob([JSON.stringify(content)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='loopq-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);message('バックアップを保存しました')}
-async function importBackup(e){const file=e.target.files?.[0];if(!file)return;if(file.size>75*1024*1024){message('バックアップのサイズが大きすぎます');return}try{const data=JSON.parse(await file.text());if(data.format!=='loopq.v2'||!Array.isArray(data.records))throw Error('形式が違います');if(data.records.length>10000)throw Error('件数が多すぎます');const cleaned=LoopQSafety.validateBackup(data);if(!confirm(`${cleaned.length}件のセットを端末に追加します。既存IDは上書きされます。よいですか？`))return;await tx('readwrite',s=>{for(const r of cleaned)s.put(r)});await refresh();message('復元しました');preferences()}catch(err){message('復元できません：'+err.message)}}
+async function importBackup(e){const file=e.target.files?.[0];if(!file)return;if(file.size>75*1024*1024){message('バックアップのサイズが大きすぎます');return}try{const data=JSON.parse(await file.text());if(data.format!=='loopq.v2'||!Array.isArray(data.records))throw Error('形式が違います');if(data.records.length>10000)throw Error('件数が多すぎます');const cleaned=LoopQSafety.validateBackup(data);if(!confirm(`${cleaned.length}件のセットを端末に追加します。既存IDは上書きされます。よいですか？`))return;await tx('readwrite',s=>{for(const r of cleaned)s.put(r)});await refresh();message('復元しました');navigate('home')}catch(err){message('復元できません：'+err.message)}}
 function manual(){
  frame(`<h1 class="page-title">手動で問題を登録</h1><div class="card manual-card"><p id="manual-step-title" class="smalltext">1 / 2　問題文</p><section id="manual-first"><div class="field"><label for="manual-exam">試験・資格</label><select id="manual-exam">${EXAMS.map(x=>`<option ${x===settings.exam?'selected':''}>${escape(x)}</option>`).join('')}</select><label for="manual-custom-exam" class="smalltext">一覧にない場合は、資格名を入力してください</label><input id="manual-custom-exam" maxlength="60" placeholder="資格名（任意）" value="${EXAMS.includes(settings.exam)?'':escape(settings.exam)}"></div><div class="field"><label for="manual-statement">○×問題文</label><textarea id="manual-statement" rows="4" maxlength="1500"></textarea></div><button class="btn primary" id="manual-next">解答・解説へ →</button></section><section id="manual-second" hidden><div class="field"><label for="manual-answer">正しい答え</label><select id="manual-answer"><option value="true">○ 正しい</option><option value="false">× 誤り</option></select></div><div class="field"><label for="manual-explanation">解説</label><textarea id="manual-explanation" rows="5" maxlength="2000"></textarea></div><div class="button-group"><button class="btn ghost" id="manual-back">戻る</button><button class="btn primary" id="manual-save">問題を保存</button></div></section><p id="manual-feedback" class="smalltext" role="status"></p></div>`);
  const feedback=document.getElementById('manual-feedback'),step=n=>{document.getElementById('manual-first').hidden=n===1;document.getElementById('manual-second').hidden=n===0;document.getElementById('manual-step-title').textContent=n?'2 / 2　解答・解説':'1 / 2　問題文';feedback.textContent=''};
@@ -240,6 +271,6 @@ function manual(){
   busy=true;document.getElementById('manual-save').disabled=true;try{await persist(r);message('保存しました');navigate('detail',r.id)}catch(e){feedback.textContent='保存できません：'+e.message;document.getElementById('manual-save').disabled=false}finally{busy=false}
  };
 }
-window.addEventListener('hashchange',()=>render());document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>navigate(b.dataset.nav));document.getElementById('top-settings').onclick=()=>navigate('settings');
+window.addEventListener('hashchange',()=>render());document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>navigate(b.dataset.nav));document.getElementById('top-settings').onclick=()=>navigate('settings');document.getElementById('top-home').onclick=()=>navigate('home');
 readDB().then(async x=>{db=x;await refresh();render();if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{})}).catch(e=>{el.innerHTML=`<div class="content"><div class="notice warn">保存機能を開始できませんでした。ブラウザのプライベートモード設定を確認してください：${escape(e.message)}</div></div>`});
 })();
