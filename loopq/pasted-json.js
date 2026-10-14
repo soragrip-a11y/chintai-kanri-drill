@@ -44,7 +44,11 @@
    const candidates=[];
    for(const span of spans){try{const v=strict(span);if(v&&roots.some(key=>Object.hasOwn(v,key)))candidates.push(v)}catch(err){if(!(err instanceof SyntaxError))throw err}}
    if(candidates.length>1)throw Error('対象形式のJSONが複数あります。保存する回答1つだけを貼り付けてください');
-   if(candidates.length!==1||depth)throw Error(/[“”]/.test(text)?'曲がった引用符（“ ”）などでJSONが崩れています。引用符を一括置換せず、ChatGPTのコードブロックのコピーボタンでコピーし直してください。': 'JSONを読み取れません。途中切れ・エスケープ・DIL等の表示用表記を確認し、ChatGPTに同じ内容をJSONコードブロックで再出力させてコピーしてください。');
+   if(candidates.length!==1||depth){
+    const structure=text.replace(/"(?:\\.|[^"\\])*"/g,'""');
+    if(/\\[()]/.test(structure))throw Error('配列の括弧が数式表記に変わっています。ChatGPTのjsonコードブロックのコピーボタンからコピーし直し、この回答欄へ貼り付けてください。コードブロックがない場合は、新しい指示文で作成し直してください。自動で括弧は変更していません。');
+    throw Error(/[“”]/.test(structure)?'JSONの引用符が曲がった引用符（“ ”）になっています。手で置き換えず、ChatGPTのjsonコードブロックのコピーボタンからコピーし直し、この回答欄へ貼り付けてください。':'JSONの形式を読み取れません。回答の一部ではなく、ChatGPTのjsonコードブロックのコピーボタンからコピーして、この回答欄へ貼り付けてください。コードブロックがない・回答が途中で終わっている場合は、新しい指示文で作成し直してください。');
+   }
    value=candidates[0];notes.push('JSON外の前後文・コードフェンスを除外しました');
   }
   for(let n=0;typeof value==='string'&&n<2;n++){value=strict(value);notes.push('JSON文字列のエスケープを1層復号しました')}

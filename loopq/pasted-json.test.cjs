@@ -18,3 +18,10 @@ test('文字列内の重複キー風文字列・スマート引用符・コー�
 test('旧版対応のMarkdown括弧を維持、文字列内のバックスラッシュを保持',()=>{
  const input=text.replace('"questions":[','"questions":\\[').replace(/\]\}$/,'\\]}');assert.deepEqual(parse(input).questions,data.questions);
 });
+test('math delimiters in structure get specific guidance and never alter content',()=>{
+ const broken=String.raw`{"sets": \({"sourceId":"a","questions":\({"statement":"sample"}\)}\)}`;
+ assert.throws(()=>LoopQPastedJSON.extract(broken,['sets']),/配列の括弧が数式表記/);
+ const copy=structuredClone(data);copy.questions[0].statement=String.raw`数式 \(x\) と “引用”`;
+ assert.deepEqual(parse(JSON.stringify(copy)).questions,copy.questions);
+ assert.throws(()=>parse(text.slice(0,-1)),/コードブロックのコピーボタン/);
+});

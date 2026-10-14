@@ -91,6 +91,7 @@ function capture(){
 }
 
 function renderHandoff(r){const pending=pendingSources();renderBatchHandoff(pending.some(x=>x.id===r.id)?pending:[r])}
+const JSON_OUTPUT_INSTRUCTIONS="回答は全体を1つのjsonコードブロック（開始行は```json、終了行は```）に入れてください。コードブロックの外に説明文は付けないでください。中身はJSON.parseで読み取れるJSONオブジェクトにしてください。配列は必ず半角の角括弧 [ ]、オブジェクトは { }、キーと文字列は半角の二重引用符を使ってください。括弧をバックスラッシュでエスケープしないでください。丸括弧・数式表記・LaTeX・DIL表記で配列を表さないでください。末尾のカンマやコメントは禁止です。文字列内の二重引用符・改行・バックスラッシュはJSONの規則でエスケープしてください。送信前に括弧の対応、各写真3問、sourceId、answerが真偽値であることを確認してください。";
 function batchPrompt(sources){
  const sample={statement:'具体的な条件を含む問題文',answer:true,explanation:'正誤の理由',reference:'実際に確認した一次資料・条文・適用時点。未確認なら未確認',trap:'要点'};
  const output=sources.length===1?{questions:[sample,{...sample,answer:false},sample]}:{sets:sources.map(r=>({sourceId:r.id,questions:[sample,{...sample,answer:false},sample]}))};
@@ -100,7 +101,8 @@ ${sources.map((r,i)=>`${i+1}枚目：sourceId=${r.id}／資格=${r.exam}${r.topi
 まとめ画像に表示された写真IDと回答のsourceIdを一致させてください。IDの取り違え・写真間の論点混在は不可。画像の不足、読み取り不能、ID不明があれば推測で埋めず、回答JSONを生成せず再添付を求めてください。
 元の文章・選択肢・固有の事例・配置を再利用せず、独立した別の事例を作成してください。難しさは元問題以上とし、各問に当事者・時期・数値・例外等の複数条件を含め、定義確認で水増ししないでください。
 法律系は試験年度と法令基準日を確認してください。未指定なら適用時点を明示し、特定年度向けの確認済みとはしないでください。法令・公的な一次資料で実際に確認した根拠のみ記載し、未確認は未確認と明記してください。各正答を独立に再検証し、疑問があれば作り直してください。
-出力は次のスキーマのJSONオブジェクトだけ。キー・sourceIdは変更せず、answerはtrue/false、他の4項目は文字列。各写真のquestionsは厳密に3問です。Markdownや前後文は付けないでください。
+${JSON_OUTPUT_INSTRUCTIONS}
+次のJSONは構造の見本です。問題文等は実際の内容に置き換え、キー・sourceIdは変更しないでください。answerはtrue/false、他の4項目は文字列。各写真のquestionsは厳密に3問です。
 ${JSON.stringify(output)}`;
 }
 async function prepareShareImage(sources){
@@ -116,7 +118,7 @@ async function prepareShareImage(sources){
 function renderBatchHandoff(sources){
  if(!sources.length||sources.length>LoopQBatch.MAX_PHOTOS){message('写真は1〜5枚で指定してください');return}
  const ids=sources.map(r=>r.id),prompt=batchPrompt(sources);
- frame(`<div class="page-heading"><h1 class="page-title">${sources.length}枚から${sources.length*3}問を作る</h1></div><div class="card batch-flow" id="batch-flow"><div id="batch-fallback" class="transfer-tools"><div class="button-group"><button id="copy-prompt" class="btn primary">① 指示文をコピー</button><button id="export-batch" class="btn primary" disabled>② 写真まとめを保存</button><a class="btn primary" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">③ ChatGPTを開く</a></div><p class="smalltext">ChatGPTで指示文を貼り付け、保存した写真まとめを添付して送信。回答全体をコピーして、この画面へ戻ってください。</p><details id="prompt-details"><summary>指示文を見る・手動コピー</summary><textarea id="handoff-prompt" rows="3" readonly></textarea></details></div><details class="details"><summary>端末の共有を使う（任意）</summary><button id="share-batch" class="btn teal" disabled>共有画像を準備中…</button></details><p class="smalltext" id="share-feedback" role="status">①→②→③の順に進めてください。写真は貼り付けではなく、ChatGPTの添付ボタンから選びます。</p><div class="field"><label for="generated-json">ChatGPTの回答</label><textarea id="generated-json" rows="3" maxlength="150000" placeholder="回答全体を貼り付け"></textarea></div><button id="paste-json" class="btn ghost sm">クリップボードから貼り付け</button><p id="handoff-feedback" class="smalltext" role="status" aria-live="polite"></p><details class="details" id="batch-preview"><summary id="batch-preview-title">写真との対応・内容を見る</summary><div id="json-preview"></div></details><p class="smalltext">AI問題は未検証です。初回の利用確認は保存済みです。</p><div class="flow-actions"><button class="btn ghost" data-go="home">ホーム</button><button class="btn primary" id="accept-json">保存して解く</button></div></div>`);
+ frame(`<div class="page-heading"><h1 class="page-title">${sources.length}枚から${sources.length*3}問を作る</h1></div><div class="card batch-flow" id="batch-flow"><div id="batch-fallback" class="transfer-tools"><div class="button-group"><button id="copy-prompt" class="btn primary">① 指示文をコピー</button><button id="export-batch" class="btn primary" disabled>② 写真まとめを保存</button><a class="btn primary" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">③ ChatGPTを開く</a></div><p class="smalltext">ChatGPTで指示文を貼り付け、保存した写真まとめを添付して送信。回答のコードブロックにあるコピーボタンを押して、この画面へ戻ってください。</p><details id="prompt-details"><summary>指示文を見る・手動コピー</summary><textarea id="handoff-prompt" rows="3" readonly></textarea></details></div><details class="details"><summary>端末の共有を使う（任意）</summary><button id="share-batch" class="btn teal" disabled>共有画像を準備中…</button></details><p class="smalltext" id="share-feedback" role="status">①→②→③の順に進めてください。写真は貼り付けではなく、ChatGPTの添付ボタンから選びます。</p><div class="field"><label for="generated-json">ChatGPTの回答</label><textarea id="generated-json" rows="3" maxlength="150000" placeholder="ChatGPTのjsonコードブロックをコピーして貼り付け"></textarea></div><button id="paste-json" class="btn ghost sm">クリップボードから貼り付け</button><p id="handoff-feedback" class="smalltext" role="status" aria-live="polite"></p><details class="details" id="batch-preview"><summary id="batch-preview-title">写真との対応・内容を見る</summary><div id="json-preview"></div></details><p class="smalltext">AI問題は未検証です。初回の利用確認は保存済みです。</p><div class="flow-actions"><button class="btn ghost" data-go="home">ホーム</button><button class="btn primary" id="accept-json">保存して解く</button></div></div>`);
  const panel=document.getElementById('batch-flow'),input=document.getElementById('generated-json'),accept=document.getElementById('accept-json'),feedback=document.getElementById('handoff-feedback'),shareInfo=document.getElementById('share-feedback'),fallback=document.getElementById('prompt-details');let parsed=null,checkedText=null,busy=false,shareFile=null,shareBusy=false;
  const promptField=document.getElementById('handoff-prompt');promptField.value=prompt;
  const enabled=()=>{accept.disabled=busy};
@@ -140,7 +142,7 @@ function renderBatchHandoff(sources){
  accept.onclick=async()=>{
   if(busy)return;
   if(settings.aiUseNoticeVersion!==1){onboarding();return}
-  try{parsed=LoopQBatch.parse(input.value,ids);checkedText=input.value}catch(e){feedback.textContent=input.value?'保存できません：'+e.message+'。今回の指示文で返った回答全体を貼り付けてください。':'ChatGPTの回答を先に貼り付けてください';feedback.scrollIntoView({block:'nearest'});input.focus();return}
+  try{parsed=LoopQBatch.parse(input.value,ids);checkedText=input.value}catch(e){feedback.textContent=input.value?'保存できません：'+e.message+'（学習履歴は変更していません）':'ChatGPTの回答を先に貼り付けてください';feedback.scrollIntoView({block:'nearest'});input.focus();return}
   busy=true;enabled();input.disabled=true;
   try{
    const verified=LoopQBatch.parse(input.value,ids),saved=await persistQuestions(verified.sets);
@@ -179,7 +181,7 @@ function detail(id){
  document.getElementById('quiz-source')?.addEventListener('click',()=>startQuiz([r]));document.getElementById('open-handoff')?.addEventListener('click',()=>renderHandoff(r));
 }
 
-function handoffPrompt(r){return `あなたは資格試験の応用問題を作る作問者です。ユーザーがこのチャットに添付する試験問題の写真から、論点と難易度を分析し、元の文章・選択肢・固有の事例・配置を再利用せず、独立した新しい○×問題を厳密に3問作ってください。\n\n【資格】${r.exam}\n【メモ】${r.topic||'なし'}\n【元問題のタイトル】${r.title}\n\n必須条件：\n・元問題と同じ水準以上の難しさ。基礎的な定義確認で水増ししない。\n・各問に具体的な事例、例外、数字、時期、当事者など複数条件を含める。\n・元問題の創作的表現をコピーしたり、軽く言い換えたりしない。\n・正答と、誤りの理由が分かる解説を付ける。\n・法律系は適用される試験年度の施行法令を確認し、未確認の根拠は推測して書かない。\n・各問について正答をもう一度独立に検証し、疑問があれば作り直す。\n・出力は**以下の形式のJSONオブジェクトのみ**。Markdownコードブロックも前置きも不要。\n\n{\"questions\":[{\"statement\":\"問題文\",\"answer\":true,\"explanation\":\"解説\",\"reference\":\"実際に確認できた法令・公的出典名と条文（未確認なら未確認）\",\"trap\":\"ひっかけの要点\"},{\"statement\":\"問題文\",\"answer\":false,\"explanation\":\"解説\",\"reference\":\"確認できた根拠または未確認\",\"trap\":\"要点\"},{\"statement\":\"問題文\",\"answer\":true,\"explanation\":\"解説\",\"reference\":\"根拠\",\"trap\":\"要点\"}]}\n\nこのチャットに写真が実際に添付されていることを確認してから生成してください。画像が見えない場合は問題を生成せず、写真の添付を依頼してください。`}
+function handoffPrompt(r){return `あなたは資格試験の応用問題を作る作問者です。ユーザーがこのチャットに添付する試験問題の写真から、論点と難易度を分析し、元の文章・選択肢・固有の事例・配置を再利用せず、独立した新しい○×問題を厳密に3問作ってください。\n\n【資格】${r.exam}\n【メモ】${r.topic||'なし'}\n【元問題のタイトル】${r.title}\n\n必須条件：\n・元問題と同じ水準以上の難しさ。基礎的な定義確認で水増ししない。\n・各問に具体的な事例、例外、数字、時期、当事者など複数条件を含める。\n・元問題の創作的表現をコピーしたり、軽く言い換えたりしない。\n・正答と、誤りの理由が分かる解説を付ける。\n・法律系は適用される試験年度の施行法令を確認し、未確認の根拠は推測して書かない。\n・各問について正答をもう一度独立に検証し、疑問があれば作り直す。\n・${JSON_OUTPUT_INSTRUCTIONS}\n\n{\"questions\":[{\"statement\":\"問題文\",\"answer\":true,\"explanation\":\"解説\",\"reference\":\"実際に確認できた法令・公的出典名と条文（未確認なら未確認）\",\"trap\":\"ひっかけの要点\"},{\"statement\":\"問題文\",\"answer\":false,\"explanation\":\"解説\",\"reference\":\"確認できた根拠または未確認\",\"trap\":\"要点\"},{\"statement\":\"問題文\",\"answer\":true,\"explanation\":\"解説\",\"reference\":\"根拠\",\"trap\":\"要点\"}]}\n\nこのチャットに写真が実際に添付されていることを確認してから生成してください。画像が見えない場合は問題を生成せず、写真の添付を依頼してください。`}
 function cleanPastedQuestions(value){
  return LoopQPastedJSON.parse(value).questions.map(q=>({...q,id:uid(),attempts:0,correct:0,weak:false}));
 }

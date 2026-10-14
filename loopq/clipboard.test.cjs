@@ -14,3 +14,8 @@ test('copy denial opens the actual manual-copy details without a success claim',
  const env=app([{...record,questions:[]}]);env.context.navigator.clipboard={writeText:async()=>{throw Error('denied')}};env.api.renderBatchHandoff([{...record,questions:[]}]);await env.get('copy-prompt').onclick();
  assert.equal(env.get('prompt-details').open,true);assert.match(env.get('share-feedback').textContent,/手動でコピー/);assert.doesNotMatch(env.get('share-feedback').textContent,/コピーしました/);
 });
+test('single and batch prompts require one valid JSON code block with exact IDs',()=>{
+ const {api}=app();for(const sources of [[record],[record,{...record,id:'second'}]]){
+  const prompt=api.batchPrompt(sources);assert.match(prompt,/1つのjsonコードブロック/);assert.match(prompt,/JSON.parse/);assert.match(prompt,/バックスラッシュでエスケープしない/);assert.doesNotMatch(prompt,/Markdownや前後文は付けない/);for(const r of sources)assert.ok(prompt.includes(r.id));
+ }
+});
