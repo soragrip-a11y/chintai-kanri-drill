@@ -180,3 +180,8 @@ body{margin:0}
 .transfer-tools{margin:10px 0;padding:10px;border:1px solid #dce7ee;border-radius:12px;background:#f4faff}.transfer-tools .button-group{display:grid;grid-template-columns:1fr;gap:8px;margin:0}.transfer-tools .btn{width:100%}
 #handoff-feedback:not(:empty){padding:10px;border-left:3px solid #0878a4;background:#edf8fd;overflow-wrap:anywhere}
 @media(min-width:761px){.transfer-tools .button-group{grid-template-columns:repeat(3,1fr)}}
+/* Keep mobile form text readable before focus, so Safari need not magnify it.
+   Preserve normal browser/pinch zoom and desktop form sizing. */
+@media (max-width:760px), (any-pointer:coarse){
+ .layout input,.layout select,.layout textarea,.layout .handoff-card .code-input{font-size:max(16px,1em)}
+}
