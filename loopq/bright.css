@@ -34,3 +34,21 @@ body{background:var(--bg);color:var(--text);letter-spacing:0;}
 .manual-fallback{margin-top:14px;border:1px solid #dce7ef;border-radius:14px;background:#fff;padding:12px;}
 .manual-fallback>summary{cursor:pointer;color:#52647e;font-weight:750;font-size:13px;padding:6px 5px;}
 .manual-fallback .handoff-card{box-shadow:none;border:none;padding:14px 4px;}
+
+/* LoopQ focused learning: fewer competing controls and clear mastery progress */
+.loopq-progress{margin-bottom:9px}
+.loopq-progress-track{height:9px;background:#e7edf5;border-radius:999px;overflow:hidden;margin:12px 0 7px}
+.loopq-progress-track span{display:block;height:100%;background:#247e78;border-radius:999px;transition:width .25s}
+@media(max-width:700px){
+ .content{padding-top:14px}
+ .hero{padding:20px 18px}
+ .hero h1{font-size:clamp(26px,7vw,34px);line-height:1.27}
+ .hero p{margin-bottom:14px}
+ .hero-art{display:none}
+ .stats-grid{gap:7px}
+ .stats-grid .stat{padding:12px 10px}
+ .stats-grid .stat b{font-size:27px}
+ .section-title{margin-top:16px}
+ .subhead{margin-bottom:14px}
+ .button-group{gap:7px}
+}
