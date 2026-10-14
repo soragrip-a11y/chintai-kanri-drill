@@ -24,10 +24,14 @@
     if(!plain(q))throw new Error('問題データが不正です');
     const attempts=num(q.attempts??0,10_000_000),correct=num(q.correct??0,10_000_000);
     if(correct>attempts)throw new Error('正答数が解答数を超えています');
-    if(typeof q.answer!=='boolean')throw new Error('正解形式が不正です');
+    const original=q.kind==='original';
+    if(typeof q.answer!=='boolean'&&!(original&&q.answer===null))throw new Error('正解形式が不正です');
+    if(original&&q.answer===null&&(attempts||correct||q.mastered||q.successDays))throw Error('正答未確認の問題には採点履歴を保存できません');
+    const provenance=original?{kind:'original',originalId:str(q.originalId??'',128)}:{};
+    for(const key of ['sourcePage','answerPage'])if(original&&q[key]!==undefined){const n=num(q[key],100000);if(!n)throw Error('ページ番号が不正です');provenance[key]=n}
     const lastAnsweredAt=q.lastAnsweredAt===undefined?{}:{lastAnsweredAt:str(q.lastAnsweredAt,64,true)};
     if(lastAnsweredAt.lastAnsweredAt&&!Number.isFinite(Date.parse(lastAnsweredAt.lastAnsweredAt)))throw Error('最終解答日時が不正です');
-    return {...lastAnsweredAt,id:id(q.id),statement:str(q.statement,2500,true),answer:q.answer,explanation:str(q.explanation,5000,true),reference:str(q.reference??'',1500),trap:str(q.trap??'',1500),attempts,correct,weak:bool(q.weak),mastered:bool(q.mastered),successDays:num(q.successDays??0,10_000_000),lastSuccessDay:str(q.lastSuccessDay??'',16)};
+    return {...lastAnsweredAt,...provenance,id:id(q.id),statement:str(q.statement,2500,true),answer:q.answer,explanation:str(q.explanation,5000,!original),reference:str(q.reference??'',1500),trap:str(q.trap??'',1500),attempts,correct,weak:bool(q.weak),mastered:bool(q.mastered),successDays:num(q.successDays??0,10_000_000),lastSuccessDay:str(q.lastSuccessDay??'',16)};
   }
   function cleanRecord(r){
     if(!plain(r))throw new Error('問題セットが不正です');
@@ -38,7 +42,10 @@
     if(!Number.isFinite(Date.parse(createdAt)))throw new Error('保存日付が不正です');
     const status=str(r.status??'saved',64);
     if(!['saved','manual','ai_crosschecked','review_required'].includes(status))throw new Error('問題の状態が不正です');
-    return {id:id(r.id),exam:str(r.exam,80,true),title:str(r.title,120,true),topic:str(r.topic??'',3000),image:image(r.image),questions,createdAt,weak:bool(r.weak),status};
+    let provenance={};
+    if(r.original!==undefined){const o=r.original;if(!plain(o)||o.format!=='loopq.original.v1'||questions.some(q=>q.kind!=='original'))throw Error('元問題の情報が不正です');provenance={original:{format:o.format,title:str(o.title,120,true),sourceFile:str(o.sourceFile??'',300),sourceSha256:str(o.sourceSha256??'',64),notice:str(o.notice??'',2000)}};if(provenance.original.sourceSha256&&!/^[a-f0-9]{64}$/i.test(provenance.original.sourceSha256))throw Error('元ファイルの識別値が不正です')}
+    if(questions.some(q=>q.kind==='original')&&!r.original)throw Error('元問題の出典情報がありません');
+    return {...provenance,id:id(r.id),exam:str(r.exam,80,true),title:str(r.title,120,true),topic:str(r.topic??'',3000),image:image(r.image),questions,createdAt,weak:bool(r.weak),status};
   }
   function validateBackup(raw){
     if(!plain(raw)||raw.format!=='loopq.v2'||!Array.isArray(raw.records)||raw.records.length>10_000)throw new Error('バックアップ形式または件数が不正です');
@@ -48,3 +55,4 @@
   }
   root.LoopQSafety=Object.freeze({validateBackup,safeImage});
 })(globalThis);
+

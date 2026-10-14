@@ -185,3 +185,11 @@ body{margin:0}
 @media (max-width:760px), (any-pointer:coarse){
  .layout input,.layout select,.layout textarea,.layout .handoff-card .code-input{font-size:max(16px,1em)}
 }
+
+
+/* Retain line breaks in imported original problem text. */
+.quiz-reading .question, .quiz-reading > p { white-space: pre-wrap; overflow-wrap: anywhere; }
+#original-preview .batch-question { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.original-question-detail { margin-block: 12px; }
+.original-question-detail > p { white-space: pre-wrap; overflow-wrap: anywhere; }

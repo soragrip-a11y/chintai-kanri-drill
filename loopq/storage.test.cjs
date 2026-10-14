@@ -33,7 +33,7 @@ test('100, 1000 and 10001 metadata records export into restorable parts',async()
  }
 });
 test('both service workers remove only their own obsolete caches',async()=>{
- for(const [file,prefix,current] of [['../sw.js','chintai-drill-','chintai-drill-2026-v3'],['sw.js','loopq-','loopq-v19-single-photo-json-20261014']]){
+ for(const [file,prefix,current] of [['../sw.js','chintai-drill-','chintai-drill-2026-v3'],['sw.js','loopq-','loopq-v20-original-import-20261014']]){
   const events={},deleted=[];let pending;
   vm.runInNewContext(fs.readFileSync(__dirname+'/'+file,'utf8'),{self:{addEventListener:(n,f)=>events[n]=f,clients:{claim(){} }},caches:{keys:async()=>[current,prefix+'old','other-app','loopq-unrelated-test'],delete:async k=>deleted.push(k)}});
   events.activate({waitUntil:p=>pending=p});await pending;
@@ -113,3 +113,4 @@ test('actual answer keeps same-day success count and resets it only on an incorr
  assert.equal(reset.mastered,false);assert.equal(reset.weak,true);assert.equal(reset.lastSuccessDay,'');
  assert.equal((await backupRoundTrip(wrong.api.getRecords()))[0].questions[0].successDays,0);
 });
+
