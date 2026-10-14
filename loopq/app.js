@@ -58,39 +58,8 @@ function sourceCard(r){const n=r.questions?.length||0;return `<article class="so
 function detail(id){const r=records.find(x=>x.id===id);if(!r){navigate('library');return}frame(`<div class="eyebrow">SAVED QUESTION SET</div><div class="section-title"><div><h1 class="headline">${escape(r.title)}</h1><p>${escape(r.exam)} · ${date(r.createdAt)}</p></div><span class="tag ${r.weak?'rose':'muted'}">${r.weak?'苦手に登録':'保存済み'}</span></div><div class="grid-2"><div class="card"><h3>元問題・メモ</h3>${r.image?`<img class="photo-preview" src="${escape(LoopQSafety.safeImage(r.image))}" alt="保存した元問題">`:`<div class="empty"><strong>画像なし</strong></div>`}<p class="spaced">${escape(r.topic||'論点メモはありません。')}</p><div class="button-group"><button class="btn ${r.weak?'teal':'ghost'} sm" id="weak-toggle">${r.weak?'✓ 苦手に登録中':'☆ 苦手チェック'}</button><button class="btn danger sm" id="delete-source">削除</button></div></div><div class="card"><div class="card-header"><h3>関連する練習問題</h3><span class="tag teal">${r.questions.length} / 3</span></div>${r.questions.length?r.questions.map((q,i)=>`<div class="list-row"><span class="list-icon">${i+1}</span><div class="list-text"><strong>${escape(q.statement.slice(0,75))}</strong><small>${q.attempts||0}回演習・${q.weak?'苦手指定中':'通常'}</small></div></div>`).join(''):`<div class="empty"><div class="empty-orb">✦</div><strong>類題はまだありません</strong><p>下のボタンで指示文と保存済み写真をChatGPTに渡す手順を確認できます。写真は自動送信されません。</p></div>`}<div class="button-group spaced">${r.questions.length?`<button id="quiz-source" class="btn primary">○×で復習する</button>`:`<button id="open-handoff" class="btn primary">✦ 類題を3問作る</button>`}<button class="btn ghost" data-go="library">問題集へ戻る</button></div><div class="notice spaced">ChatGPTで生成した問題は未検証です。学習前に必ず根拠法令・解説を確認してください。</div><div id="handoff-panel"></div></div></div>`);document.getElementById('weak-toggle').onclick=async()=>{r.weak=!r.weak;await persist(r);detail(id)};document.getElementById('delete-source').onclick=async()=>{if(confirm('画像・類題・学習履歴をすべて削除しますか？')){await remove(id);message('削除しました');navigate('library')}};document.getElementById('quiz-source')?.addEventListener('click',()=>startQuiz([r]));document.getElementById('open-handoff')?.addEventListener('click',()=>renderHandoff(r));/* No automatic OAuth or owner-billed API calls. */}
 
 function handoffPrompt(r){return `あなたは資格試験の応用問題を作る作問者です。ユーザーがこのチャットに添付する試験問題の写真から、論点と難易度を分析し、元の文章・選択肢・固有の事例・配置を再利用せず、独立した新しい○×問題を厳密に3問作ってください。\n\n【資格】${r.exam}\n【メモ】${r.topic||'なし'}\n【元問題のタイトル】${r.title}\n\n必須条件：\n・元問題と同じ水準以上の難しさ。基礎的な定義確認で水増ししない。\n・各問に具体的な事例、例外、数字、時期、当事者など複数条件を含める。\n・元問題の創作的表現をコピーしたり、軽く言い換えたりしない。\n・正答と、誤りの理由が分かる解説を付ける。\n・法律系は適用される試験年度の施行法令を確認し、未確認の根拠は推測して書かない。\n・各問について正答をもう一度独立に検証し、疑問があれば作り直す。\n・出力は**以下の形式のJSONオブジェクトのみ**。Markdownコードブロックも前置きも不要。\n\n{\"questions\":[{\"statement\":\"問題文\",\"answer\":true,\"explanation\":\"解説\",\"reference\":\"実際に確認できた法令・公的出典名と条文（未確認なら未確認）\",\"trap\":\"ひっかけの要点\"},{\"statement\":\"問題文\",\"answer\":false,\"explanation\":\"解説\",\"reference\":\"確認できた根拠または未確認\",\"trap\":\"要点\"},{\"statement\":\"問題文\",\"answer\":true,\"explanation\":\"解説\",\"reference\":\"根拠\",\"trap\":\"要点\"}]}\n\nこのチャットに写真が実際に添付されていることを確認してから生成してください。画像が見えない場合は問題を生成せず、写真の添付を依頼してください。`}
-// Accept Markdown-escaped array delimiters outside JSON quoted strings.
-// Never rewrite backslashes inside the actual problem statements.
-function normalizeCopiedJSON(text){
-  let quoted=false,escaped=false,changed=false,result='';
-  for(let i=0;i<text.length;i++){
-    const c=text[i];
-    if(quoted){
-      result+=c;
-      if(escaped)escaped=false;
-      else if(c==='\\')escaped=true;
-      else if(c==='"')quoted=false;
-      continue;
-    }
-    if(c==='"'){quoted=true;result+=c;continue}
-    if(c==='\\'&&'[]{}'.includes(text[i+1]||'')&&text[i+1]){changed=true;continue}
-    result+=c;
-  }
-  return {result,changed};
-}
 function cleanPastedQuestions(value){
-  if(typeof value!=='string'||value.length>30000)throw Error('回答は3万文字以内にしてください');
-  let text=value.trim();if(text.startsWith('```'))text=text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
-  let parsed;
-  try { parsed=JSON.parse(text); }
-  catch {
-    const normalized=normalizeCopiedJSON(text);
-    if(!normalized.changed)throw Error('JSONとして読み取れません。回答全体をコピーしてください。');
-    try { parsed=JSON.parse(normalized.result); }
-    catch {throw Error('括弧の表記を補正しましたがJSONを読み取れません。回答全体をコピーしてください。');}
-  }
-  if(!parsed||!Array.isArray(parsed.questions)||parsed.questions.length!==3)throw Error('3問の配列 questions が必要です');
-  const keys=['statement','explanation','reference','trap'];
-  return parsed.questions.map((q,i)=>{if(!q||typeof q!=='object'||Array.isArray(q)||typeof q.answer!=='boolean')throw Error(`${i+1}問目：正答はtrue/falseで指定してください`);for(const k of keys){if(typeof q[k]!=='string'||q[k].length>(k==='explanation'?5000:2500))throw Error(`${i+1}問目：${k}が不正です`)}if(!q.statement.trim()||!q.explanation.trim())throw Error(`${i+1}問目：問題文と解説が必要です`);return {id:uid(),statement:q.statement,answer:q.answer,explanation:q.explanation,reference:q.reference,trap:q.trap,attempts:0,correct:0,weak:false}});
+ return LoopQPastedJSON.parse(value).questions.map(q=>({...q,id:uid(),attempts:0,correct:0,weak:false}));
 }
 function photoAsFile(src, id){
  const safe=LoopQSafety.safeImage(src);
@@ -110,8 +79,8 @@ function renderHandoff(r){
  <div class="handoff-step"><div class="handoff-num">2</div><div class="handoff-step-main"><strong>保存した問題写真も添付</strong><p>iPhoneなら「写真を共有」で共有先を選ぶ方法を試せます。ChatGPTが共有先に出ない場合は、写真を保存してChatGPTの「＋」から手動で添付してください。</p><div class="button-group">${r.image?'<button class="btn primary" type="button" id="share-photo">② 写真を共有（対応端末）</button><button class="btn ghost" type="button" id="export-photo">添付用の写真を保存</button>':'<span class="smalltext">この問題セットには写真が保存されていません。写真を添付するには元問題を再度登録してください。</span>'}</div><p class="smalltext">共有先のアプリが指示文を引き継がない場合は、コピー済みの指示文を貼り付けてください。<strong>写真がChatGPTの入力欄に表示されたことを確認してから送信</strong>してください。</p><a class="btn ghost" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPTを開く ↗</a></div></div>
  <div class="handoff-step"><div class="handoff-num">3</div><div class="handoff-step-main"><strong>返ってきたJSONをLoopQに貼り付ける</strong><p>ChatGPTの回答全体をコピーして下の欄へ。必ず解答と出典を確認してから保存してください。</p></div></div>
  <details class="details"><summary>ChatGPTに送る指示文を確認・編集</summary><div class="field spaced"><label for="handoff-prompt">作問指示文</label><textarea id="handoff-prompt" class="code-input" rows="9"></textarea></div></details>
- <div class="field spaced"><label for="generated-json">ChatGPTが返した3問のJSONを貼る</label><textarea id="generated-json" class="code-input" rows="7" placeholder='{"questions":[{"statement":"...","answer":true,"explanation":"...","reference":"...","trap":"..."}, ...]}'></textarea></div>
- <label class="toggle-line"><input type="checkbox" id="manual-review-ok"><span>正答・解説・法令の適用時期を自分で確認しました。未検証の問題として保存することを理解しています。</span></label>
+ <div class="field spaced"><label for="generated-json">ChatGPTが返した3問のJSONを貼る（取込改善プレビュー）</label><textarea id="generated-json" class="code-input" rows="7" placeholder='{"questions":[{"statement":"...","answer":true,"explanation":"...","reference":"...","trap":"..."}, ...]}'></textarea></div>
+ <button class="btn teal" type="button" id="preview-json">入力を確認・プレビュー</button><div id="json-preview" role="status" aria-live="polite"></div><label class="toggle-line"><input type="checkbox" id="manual-review-ok"><span>正答・解説・法令の適用時期を自分で確認しました。未検証の問題として保存することを理解しています。</span></label>
  <button class="btn primary" type="button" id="accept-json">③ 3問をこのセットに保存</button><p id="handoff-feedback" class="smalltext" role="status" aria-live="polite"></p></div>`;
  setupLocalAI(panel,r);
  document.getElementById('handoff-prompt').value=handoffPrompt(r);
@@ -127,7 +96,32 @@ function renderHandoff(r){
    }catch(e){feedback.textContent='写真を共有できません：'+e.message}
  });
  document.getElementById('export-photo')?.addEventListener('click',()=>{const src=LoopQSafety.safeImage(r.image);if(!src){message('保存画像が見つかりません');return}const a=document.createElement('a');a.href=src;a.download='loopq-question-'+r.id+'.jpg';document.body.appendChild(a);a.click();a.remove();message('写真の保存を試みました。写真・ファイルアプリを確認してください。')});
- document.getElementById('accept-json').onclick=async()=>{const feedback=document.getElementById('handoff-feedback');if(!document.getElementById('manual-review-ok').checked){feedback.textContent='先に問題・正答・解説を確認し、チェックしてください';return}try{const newQs=cleanPastedQuestions(document.getElementById('generated-json').value);if(r.questions.length){if(!confirm('既存の類題を新しい3問に置き換えますか？解答履歴も置き換わります。'))return}r.questions=newQs;r.status='review_required';await persist(r);message('3問を保存しました（出典は未検証です）');detail(r.id)}catch(e){feedback.textContent='保存できません：'+e.message}};
+ const input=document.getElementById('generated-json'),preview=document.getElementById('json-preview'),accept=document.getElementById('accept-json');
+ let checkedText=null,busy=false;
+ accept.disabled=true;
+ input.addEventListener('input',()=>{checkedText=null;accept.disabled=true;preview.textContent='入力が変わりました。もう一度プレビューしてください';document.getElementById('manual-review-ok').checked=false});
+ document.getElementById('preview-json').onclick=()=>{
+  checkedText=null;accept.disabled=true;preview.replaceChildren();
+  try{
+   const parsed=LoopQPastedJSON.parse(input.value);
+   const info=document.createElement('p');info.textContent=input.value.length+'文字 / 3問。'+(parsed.notes.join('。')||'通常のJSONです')+'。内容は自動修正していません。';preview.append(info);
+   parsed.questions.forEach((q,i)=>{const box=document.createElement('section');box.className='notice spaced';box.style.whiteSpace='pre-wrap';box.style.overflowWrap='anywhere';box.textContent=(i+1)+'問目 '+q.statement+'\n正答：'+(q.answer?'○':'×')+'\n解説：'+q.explanation+'\n出典：'+q.reference+'\n要点：'+q.trap;preview.append(box)});
+   checkedText=input.value;accept.disabled=false;
+  }catch(e){preview.textContent='確認できません：'+e.message+'（入力と学習履歴は変更していません）'}
+ };
+ accept.onclick=async()=>{
+  const feedback=document.getElementById('handoff-feedback');
+  if(busy)return;
+  if(checkedText===null||checkedText!==input.value){feedback.textContent='先に現在の入力をプレビューしてください';return}
+  if(!document.getElementById('manual-review-ok').checked){feedback.textContent='プレビューと正答・解説を確認し、チェックしてください';return}
+  try{
+   const newQs=cleanPastedQuestions(input.value);
+   if(r.questions.length)throw Error('既存の類題と学習履歴があるため置き換えません。新しいセットに保存してください');
+   busy=true;accept.disabled=true;
+   const updated={...r,questions:newQs,status:'review_required'};
+   await persist(updated);message('3問を保存しました（出典は未検証です）');detail(r.id);
+  }catch(e){feedback.textContent='保存できません：'+e.message}finally{busy=false;accept.disabled=false}
+ };
  panel.scrollIntoView({block:'start',behavior:'smooth'});
 }
 
