@@ -25,7 +25,9 @@
     const attempts=num(q.attempts??0,10_000_000),correct=num(q.correct??0,10_000_000);
     if(correct>attempts)throw new Error('正答数が解答数を超えています');
     if(typeof q.answer!=='boolean')throw new Error('正解形式が不正です');
-    return {id:id(q.id),statement:str(q.statement,2500,true),answer:q.answer,explanation:str(q.explanation,5000,true),reference:str(q.reference??'',1500),trap:str(q.trap??'',1500),attempts,correct,weak:bool(q.weak),mastered:bool(q.mastered),successDays:num(q.successDays??0,3),lastSuccessDay:str(q.lastSuccessDay??'',16)};
+    const lastAnsweredAt=q.lastAnsweredAt===undefined?{}:{lastAnsweredAt:str(q.lastAnsweredAt,64,true)};
+    if(lastAnsweredAt.lastAnsweredAt&&!Number.isFinite(Date.parse(lastAnsweredAt.lastAnsweredAt)))throw Error('最終解答日時が不正です');
+    return {...lastAnsweredAt,id:id(q.id),statement:str(q.statement,2500,true),answer:q.answer,explanation:str(q.explanation,5000,true),reference:str(q.reference??'',1500),trap:str(q.trap??'',1500),attempts,correct,weak:bool(q.weak),mastered:bool(q.mastered),successDays:num(q.successDays??0,3),lastSuccessDay:str(q.lastSuccessDay??'',16)};
   }
   function cleanRecord(r){
     if(!plain(r))throw new Error('問題セットが不正です');
