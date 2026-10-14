@@ -53,6 +53,8 @@ body{background:var(--bg);color:var(--text);letter-spacing:0;}
  .button-group{gap:7px}
 }
 
+
+
 /* Home quick-start: one choice, one tap, no scroll required */
 .home-start{padding:10px 0 14px}
 .home-start h1{font-size:clamp(25px,5vw,38px);letter-spacing:-.045em;margin:6px 0 3px;color:#20374a}
@@ -82,3 +84,73 @@ body{background:var(--bg);color:var(--text);letter-spacing:0;}
 .home-progress-head{margin-top:11px}
 .home-progress-summary{font-size:12px;flex-wrap:wrap}
 }
+/* Compact screens. Long text remains scrollable at large type and short heights. */
+:root{--cyan:#0878a4;--lav:#0878a4}
+body{margin:0}
+.mainwrap{height:100vh;height:100dvh;display:flex;flex-direction:column;min-width:0}
+.topbar{height:52px;min-height:52px;padding:0 24px;flex:none}
+#app{flex:1;min-height:0;overflow:auto;overscroll-behavior-y:contain;scroll-padding:12px}
+.content{max-width:940px;margin:0 auto;padding:16px 24px;min-width:0}
+.page-title{font-size:24px;line-height:1.3;margin:0 0 14px;font-weight:800;letter-spacing:0}
+.page-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.page-heading .page-title{margin:0}
+.card,.source-card,.handoff-card,.home-action{box-shadow:none}
+.card{padding:16px}
+.btn.primary,.pill.active{background:#0878a4;border-color:#0878a4;color:white}
+.btn.primary:hover{background:#056385}
+.btn.teal{background:#e6f6fc;border-color:#b5e1f0;color:#086083}
+.side-nav button.active,.mobile-nav button.active{background:#e2f4fc;color:#075d81;box-shadow:none}
+.home-start{padding:0 0 8px}.home-start h1{font-size:26px;margin:0 0 14px}
+.home-action-main{background:#e5f5fc;border-color:#98d3eb}.home-action-icon{color:#0878a4}
+.home-action{box-shadow:none}.home-progress-head{margin-top:14px}
+.capture-card{max-width:620px;display:grid;gap:10px}
+.capture-card .field{margin:0}.capture-card .field label{font-size:12px;margin-bottom:4px}
+.capture-card input,.capture-card select{padding:10px 12px;min-height:44px}
+.capture-card .drop{margin:0;padding:12px;min-height:92px;display:grid;place-items:center;cursor:pointer}
+.capture-card .smalltext{margin:0;line-height:1.5}
+.capture-card .capture-photo{display:block;max-width:100%;width:auto;height:95px;object-fit:contain;margin:auto;border-radius:8px}
+.compact-filter{display:flex;gap:10px;align-items:center;margin:0 0 12px}.compact-filter label{margin:0}.compact-filter select{flex:1;min-width:0;padding:9px}
+.source-card{padding:14px;gap:12px}.source-card h3{font-size:14px;margin:3px 0;overflow-wrap:anywhere}
+.source-card small{color:var(--muted);font-size:11px}.source-card .source-buttons{gap:7px;display:flex;flex-wrap:wrap}
+.photo-thumb{height:52px;width:52px}.source-top>[data-photo]:empty{display:none}
+.page-controls{display:flex;gap:14px;align-items:center;justify-content:center;margin-top:12px;font-size:13px}
+.btn:disabled,.answer-choice:disabled{opacity:.45;cursor:not-allowed}
+.segmented{display:flex;gap:8px;margin:0 0 12px}.segmented .btn{flex:1}
+.detail-photo{display:block;width:100%;height:clamp(100px,35dvh,320px);object-fit:contain;margin-bottom:12px}
+.question-list{max-height:34dvh;overflow:auto;overflow-wrap:anywhere}.question-list p{font-size:13px;margin:0 0 12px}
+.handoff-card{margin:0;padding:16px;background:#fff}
+.handoff-card>section>.button-group{margin:10px 0}
+.handoff-card .details{margin:10px 0}.handoff-card .field{margin:12px 0}
+.handoff-card .code-input{min-height:100px;max-height:24dvh;padding:10px;resize:vertical}
+.handoff-card p{margin:8px 0;line-height:1.6}
+.handoff-card .toggle-line{margin:12px 0;font-size:12px}
+.preview-question{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75;font-size:14px;max-height:40dvh;overflow:auto;padding:10px;border:1px solid #dae6ee;border-radius:10px}
+.review-actions{display:grid;gap:12px;max-width:600px}.review-actions .btn{min-height:72px;font-size:18px}
+.quiz-shell{max-width:780px;margin:0 auto}.quiz-card{display:flex;flex-direction:column;gap:12px;max-height:calc(100dvh - 145px)}
+.quiz-head{margin-bottom:12px}.quiz-card .smalltext{margin:0}.quiz-card .segmented{margin:0;flex:none}
+.quiz-reading{min-height:48px;overflow:auto;overscroll-behavior:contain;overflow-wrap:anywhere;flex:1;max-height:55dvh}
+.quiz-reading p{white-space:pre-wrap;margin:0 0 12px;line-height:1.8;font-size:15px}.quiz-reading .question{font-size:17px;margin:0;font-weight:650;line-height:1.8}
+.answer-choice{min-height:56px;padding:12px;font-size:18px;border-color:#a0d3e7;background:#eff9fd;color:#12546d}
+.answer-result{font-size:36px;font-weight:900;line-height:1.2;flex:none}
+.answer-result.result-correct{color:#bd2435}.answer-result.result-wrong{color:#086bb7}
+.answer-summary{display:flex;gap:8px 20px;flex-wrap:wrap;font-size:14px;flex:none}
+.quiz-actions{margin:0;flex:none;justify-content:space-between}.quiz-actions .btn{min-height:44px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+[hidden]{display:none!important}
+@media(max-width:760px){
+ .mainwrap{height:calc(100vh - 68px - env(safe-area-inset-bottom));height:calc(100dvh - 68px - env(safe-area-inset-bottom))}
+ .topbar{height:46px;min-height:46px;padding:0 14px}.content{padding:12px 14px}
+ .mobile-nav{grid-template-columns:repeat(4,1fr);min-height:68px;box-sizing:border-box;padding:5px 4px calc(5px + env(safe-area-inset-bottom))}
+ .mobile-nav button{min-height:48px;font-size:11px}.mobile-nav button span{font-size:21px}
+ .page-title{font-size:22px;margin-bottom:12px}.card{padding:14px}
+ .source-grid{gap:10px}.source-card{padding:12px;gap:10px}.source-card .source-buttons .btn{padding:8px 10px;font-size:12px}
+ .handoff-card{padding:12px}.handoff-card .btn{width:auto}.handoff-card .button-group{display:flex;flex-wrap:wrap}
+ .handoff-card #copy-prompt,.handoff-card #handoff-to-input{width:100%}
+ .preview-question{max-height:calc(100dvh - 390px);min-height:90px}
+ .quiz-card{max-height:calc(100dvh - 190px);gap:10px}.quiz-reading{max-height:calc(100dvh - 290px)}
+ .answer-result{font-size:34px}.quiz-reading .question{font-size:16px}
+}
+.manual-card{max-width:620px}.manual-card .field{margin:0 0 12px}.manual-card textarea{min-height:90px;max-height:25dvh}.manual-card .field label{margin:5px 0}.manual-card p{margin:0 0 10px}
+.capture-card .field{gap:4px}.capture-card>p:empty{display:none}.capture-card .capture-photo{height:72px}
+.custom-exam summary{font-size:12px;color:#415a6d;cursor:pointer;min-height:32px;display:list-item;padding:6px 0}
+.custom-exam[open] .field{margin-top:5px}
