@@ -177,3 +177,6 @@ body{margin:0}
  .batch-flow{padding:12px}.flow-actions{bottom:-1px}.capture-card{gap:8px}
 }
 @media(max-height:650px){.quiz-card{max-height:none}.quiz-reading{max-height:35dvh}.thumb-dock>.btn,.thumb-dock>.answer-choice{height:52px;min-height:52px}}
+.transfer-tools{margin:10px 0;padding:10px;border:1px solid #dce7ee;border-radius:12px;background:#f4faff}.transfer-tools .button-group{display:grid;grid-template-columns:1fr;gap:8px;margin:0}.transfer-tools .btn{width:100%}
+#handoff-feedback:not(:empty){padding:10px;border-left:3px solid #0878a4;background:#edf8fd;overflow-wrap:anywhere}
+@media(min-width:761px){.transfer-tools .button-group{grid-template-columns:repeat(3,1fr)}}
