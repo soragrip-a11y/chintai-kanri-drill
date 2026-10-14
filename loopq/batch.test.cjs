@@ -28,3 +28,8 @@ test('stale view, deleted photo, invalid question all abort every write',async()
 test('new photo batch is all or nothing and never replaces an existing ID',async()=>{
  const db=database([record('b')]);await assert.rejects(B.commit(db,'sources',[record('a'),record('b')],'new'));assert.equal(db.data.has('a'),false);const full=database([]);await B.commit(full,'sources',[record('a'),record('b')],'new');assert.equal(full.data.size,2);
 });
+test('valid JSON with another batch IDs is rejected with both IDs, distinct from duplicates',()=>{
+ const text=JSON.stringify(batch);assert.throws(()=>B.parse(text,['new-a','new-b']),e=>e.message.includes('保存先：new-a / new-b')&&e.message.includes('回答：a / b'));
+ assert.throws(()=>B.parse(JSON.stringify({sets:[batch.sets[0],batch.sets[0]]}),['a','b']),/同じ写真IDが重複/);
+ assert.deepEqual(B.parse('<escape>'+text+'</escape>',['a','b']).sets,batch.sets);
+});

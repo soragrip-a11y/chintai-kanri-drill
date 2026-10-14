@@ -10,7 +10,9 @@
   const seen=new Map();
   for(const set of value.sets){
    if(!set||Array.isArray(set)||typeof set!=='object'||Object.keys(set).length!==2||!Object.hasOwn(set,'sourceId')||!Object.hasOwn(set,'questions'))throw Error('各セットにはsourceIdとquestionsだけを指定してください');
-   if(!ids.includes(set.sourceId)||seen.has(set.sourceId))throw Error('写真IDが不明または重複しています。保存は行いません');
+   if(typeof set.sourceId!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(set.sourceId))throw Error('回答のsourceIdは写真IDの文字列で指定してください');
+   if(seen.has(set.sourceId))throw Error('回答で同じ写真IDが重複しています：'+set.sourceId+'。各写真は1セットにしてください。保存は行いません');
+   if(!ids.includes(set.sourceId))throw Error('回答と保存先の写真IDが一致しません。保存先：'+ids.join(' / ')+'。回答：'+value.sets.map(x=>typeof x?.sourceId==='string'&&/^[A-Za-z0-9_-]{1,128}$/.test(x.sourceId)?x.sourceId:'（不正なID）').join(' / ')+'。別の回の指示文・写真まとめが混ざっている可能性があります。この画面の指示文と写真まとめを同じ組で使用してください。回答のIDは自動変更していません');
    const questions=root.LoopQPastedJSON.parse(JSON.stringify({questions:set.questions})).questions;
    seen.set(set.sourceId,{sourceId:set.sourceId,questions});
   }

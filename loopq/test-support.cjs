@@ -2,7 +2,7 @@ const vm=require('node:vm'),fs=require('node:fs');
 require('./safety.js');require('./pasted-json.js');require('./batch.js');
 function app(records=[],write=async()=>{},initialSettings={aiUseNoticeVersion:1}){
  const nodes=new Map(),frames=[],storage=new Map([['loopq-settings-v2',JSON.stringify(initialSettings)]]);
- const element=()=>({value:'',checked:false,disabled:false,hidden:false,textContent:'',children:[],style:{},dataset:{},classList:{add(){},remove(){},toggle(){}},querySelector:()=>null,focus(){},select(){},addEventListener(k,f){this[k]=f},append(...xs){this.children.push(...xs)},replaceChildren(){this.children=[]},scrollIntoView(){}});
+ const element=()=>({value:'',checked:false,disabled:false,hidden:false,textContent:'',children:[],style:{},dataset:{},classList:{add(){},remove(){},toggle(){}},querySelector:()=>null,setAttribute(k,v){this[k]=v},focus(){},select(){},addEventListener(k,f){this[k]=f},append(...xs){this.children.push(...xs)},replaceChildren(){this.children=[]},scrollIntoView(){}});
  const get=id=>{if(!nodes.has(id))nodes.set(id,element());return nodes.get(id)};
  Object.defineProperty(get('app'),'innerHTML',{set(s){frames.push(s)},get(){return frames.at(-1)}});
  const location={hash:'#home'},context=vm.createContext({document:{getElementById:get,querySelectorAll:()=>[],createElement:element},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},location,history:{pushState(a,b,hash){location.hash=hash}},window:{location,scrollTo(){},addEventListener(){}},LoopQSafety,LoopQPastedJSON,LoopQBatch,console,navigator:{},setTimeout:()=>0,clearTimeout(){},crypto:{randomUUID:()=>Math.random().toString(36).slice(2)}});
