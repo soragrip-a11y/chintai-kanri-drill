@@ -28,3 +28,10 @@ test('reopening a pending batch retains IDs and prompt; a new batch cannot accep
  env.api.renderBatchHandoff(sources);const first=env.get('handoff-prompt').value;env.api.home();env.api.renderBatchHandoff(env.api.pendingSources());assert.equal(env.get('handoff-prompt').value,first);
  assert.match(first,/作業の選択肢や開始確認は不要/);assert.match(first,/IDを新しく作ったり/);
 });
+test('photo prompts support unlabelled originals without ID confirmation, but retain real mismatch guards',()=>{
+ const {api}=app();for(const count of [1,3,5]){
+  const sources=Array.from({length:count},(_,i)=>({...record,id:'source-'+i})),p=api.batchPrompt(sources);
+  assert.match(p,/画像内にIDがないことだけを理由に停止したり/);assert.match(p,/添付順（まとめ画像なら上から順）/);assert.match(p,/IDが実際に表示されているのに対象写真のIDと矛盾/);assert.match(p,/枚数が不足/);assert.match(p,/問題文が読み取れない/);assert.doesNotMatch(p,/ID不明があれば|ID付きの元問題写真が/);
+  const sample=JSON.parse(p.slice(p.lastIndexOf('\n')+1));if(count===1)assert.equal(sample.questions.length,3);else assert.deepEqual(sample.sets.map(x=>x.sourceId),sources.map(x=>x.id));
+ }
+});

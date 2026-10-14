@@ -33,7 +33,7 @@ test('100, 1000 and 10001 metadata records export into restorable parts',async()
  }
 });
 test('both service workers remove only their own obsolete caches',async()=>{
- for(const [file,prefix,current] of [['../sw.js','chintai-drill-','chintai-drill-2026-v3'],['sw.js','loopq-','loopq-v15-storage-20261014']]){
+ for(const [file,prefix,current] of [['../sw.js','chintai-drill-','chintai-drill-2026-v3'],['sw.js','loopq-','loopq-v16-photo-order-20261014']]){
   const events={},deleted=[];let pending;
   vm.runInNewContext(fs.readFileSync(__dirname+'/'+file,'utf8'),{self:{addEventListener:(n,f)=>events[n]=f,clients:{claim(){} }},caches:{keys:async()=>[current,prefix+'old','other-app','loopq-unrelated-test'],delete:async k=>deleted.push(k)}});
   events.activate({waitUntil:p=>pending=p});await pending;
