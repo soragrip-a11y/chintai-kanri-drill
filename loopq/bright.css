@@ -193,3 +193,16 @@ body{margin:0}
 
 .original-question-detail { margin-block: 12px; }
 .original-question-detail > p { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Keep answer choices and Next in separate, stable rows on every question. */
+.quiz-dock.thumb-dock{display:flex;flex-direction:column;gap:8px;padding-top:10px;padding-bottom:10px}
+.quiz-dock .answer-grid,.quiz-navigation{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;width:100%}
+.quiz-dock .answer-choice,.quiz-dock .btn{height:52px;min-height:52px;width:100%;padding:8px;font-size:16px;border-radius:14px;white-space:normal}
+.quiz-dock .answer-choice:disabled{opacity:.55}
+.quiz-shell{padding-bottom:160px}
+.quiz-card{max-height:none;overflow:visible}
+.quiz-reading{max-height:none;overflow:visible;flex:none;min-height:48px}
+.quiz-reading[hidden]{display:none}
+.resume-quizzes{background:#fff;border:1px solid #cfe2ee;border-radius:16px;padding:16px;margin:18px 0}
+.resume-quizzes h2{font-size:17px;margin:0 0 10px}.resume-quiz-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #edf2f7}.resume-quiz-row strong{overflow-wrap:anywhere}.resume-quiz-row>div{min-width:0}.resume-quiz-row .btn{flex:none}.resume-quiz-row p{margin:5px 0}
+@media(max-width:760px){.quiz-dock.thumb-dock{bottom:calc(68px + env(safe-area-inset-bottom));padding-inline:max(14px,env(safe-area-inset-left)) max(14px,env(safe-area-inset-right))}.quiz-shell{padding-bottom:160px}.quiz-card,.quiz-reading{max-height:none}}

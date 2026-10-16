@@ -1,0 +1,36 @@
+/* Text import is a first-class path; scope all styles to avoid quiz/photo changes. */
+.text-entry{max-width:780px;min-width:0}
+.text-entry-intro{margin:0 0 16px;line-height:1.7}
+.text-entry .card{margin-bottom:14px}
+.text-entry-ready{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#eff8fc;border-color:#b9ddea}
+.text-entry-ready strong{font-size:15px}
+.text-entry .smalltext{line-height:1.7;margin:6px 0}
+.text-entry-card h2{display:flex;align-items:center;gap:8px;font-size:18px;margin:0 0 10px;line-height:1.5}
+.text-step{display:inline-grid;place-items:center;width:27px;height:27px;flex-shrink:0;border-radius:50%;background:#e2f4fc;color:#075d81;font-size:14px}
+.text-entry .field{margin:14px 0 8px}
+.text-entry textarea{display:block;box-sizing:border-box;width:100%;min-width:0;resize:vertical;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75}
+.text-entry #text-source{min-height:230px;max-height:55dvh}
+.text-entry #text-prompt{min-height:150px;max-height:40dvh;margin-top:8px;font-size:14px}
+.text-entry #text-prompt-panel{margin-top:14px}
+.text-entry input{box-sizing:border-box;width:100%;min-height:44px}
+.text-entry-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px}
+.text-entry-meta .smalltext{font-size:12px}
+.text-entry-actions,.text-entry-footer{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.text-entry .btn{white-space:normal;line-height:1.5;min-height:48px}
+.text-entry .text-entry-feedback:not(:empty){padding:10px 12px;background:#f2f8fc;border-left:3px solid #0878a4;overflow-wrap:anywhere}
+.text-entry textarea[aria-invalid="true"]{border-color:#a7303c}
+.home-action-text,.home-actions .home-action[data-go="text"]{background:#e5f5fc;border-color:#98d3eb}
+.text-entry-choice,.text-entry-invitation{max-width:620px;background:#eff8fc;border-color:#b9ddea}
+.text-entry-choice .btn,.text-entry-invitation .btn{width:100%;white-space:normal;min-height:54px}
+.text-entry-choice p,.text-entry-invitation p{line-height:1.65}
+@media(max-width:760px){
+ .text-entry-ready{display:block}.text-entry-ready>.btn{width:100%;margin-top:6px}
+ .text-entry #text-source{min-height:210px;max-height:50dvh}
+ .text-entry-actions>.btn{width:100%}
+ .text-entry textarea,.text-entry input,.text-entry #text-prompt{font-size:16px}
+ .text-entry-card h2{font-size:17px}
+ .text-entry-footer{display:grid;grid-template-columns:1fr 1fr}
+ .text-entry-footer .btn{padding-inline:10px}
+}
+
+.text-entry-invitation h2{margin:0 0 12px;font-size:18px;line-height:1.5}
