@@ -96,6 +96,10 @@ class AuthEngine:
             token = self.session
             if not token:
                 raise UserVisibleError('ChatGPT未接続です。PC版の設定から接続してください。')
+            # Fail closed if the signed-in account has not granted both required scopes.
+            granted = set((token.get('scope') or '').split())
+            if not {'chatgpt.tokens.use.direct', 'resource.invoke'} <= granted:
+                raise UserVisibleError('ChatGPT本人利用枠の使用許可がありません。再接続してください。')
             if time.time() < token.get('expiry', 0) - 90:
                 return token['access_token']
             if not token.get('refresh_token'):
@@ -237,7 +241,13 @@ class AuthEngine:
             try: event=json.loads(line)
             except ValueError: continue
             typ=event.get('type')
-            if typ=='response.output_text.delta':chunks.append(event.get('delta',''))
+            if typ=='response.output_text.delta':
+                delta=event.get('delta','')
+                if not isinstance(delta,str):
+                    raise UserVisibleError('AI応答の形式が不正です。保存しません。')
+                chunks.append(delta)
+                if sum(map(len,chunks))>90_000:
+                    raise UserVisibleError('AI応答が長すぎます。問題は保存されません。')
             if typ=='response.completed':
                 completed=True
                 if not chunks:
@@ -269,7 +279,6 @@ class AuthEngine:
         return items
 
     def generate(self, data):
-        from html import escape
         if not isinstance(data,dict): raise UserVisibleError('入力形式が不正です。')
         model=data.get('model')
         if not isinstance(model,str) or not re.fullmatch(r'[A-Za-z0-9._-]{1,100}',model):

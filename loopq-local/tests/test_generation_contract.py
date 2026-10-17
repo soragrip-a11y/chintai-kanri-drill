@@ -30,7 +30,7 @@ class Client:
 class ContractTests(unittest.TestCase):
     def test_two_calls_only_user_oauth_and_image(self):
         fake=Client();a=m.AuthEngine(Store(),8765,client=fake)
-        a.session={'access_token':'SYNTHETIC_USER_OAUTH','expiry':time.time()+3600,'scope':'chatgpt.tokens.use.direct','client_id':'oaiapp_abc'}
+        a.session={'access_token':'SYNTHETIC_USER_OAUTH','expiry':time.time()+3600,'scope':'chatgpt.tokens.use.direct resource.invoke','client_id':'oaiapp_abc'}
         data={'model':'gpt-6.1-sol','image':'data:image/jpeg;base64,'+'eA==','exam':'宅建','topic':'契約と通知','consent':True}
         result=a.generate(data)
         self.assertEqual(len(result['questions']),3)
@@ -46,4 +46,28 @@ class ContractTests(unittest.TestCase):
         fake=Client();a=m.AuthEngine(Store(),8765,client=fake)
         with self.assertRaises(m.UserVisibleError):a.generate({'model':'gpt-6.1-sol','image':'data:image/jpeg;base64,eA==','consent':False})
         self.assertEqual(len(fake.calls),0)
+    def test_missing_direct_plan_scope_blocks_inference(self):
+        fake=Client();a=m.AuthEngine(Store(),8765,client=fake)
+        a.session={'access_token':'synthetic','expiry':time.time()+3600,
+                   'scope':'openid profile email','client_id':'oaiapp_abc'}
+        with self.assertRaisesRegex(m.UserVisibleError,'利用枠の使用許可'):
+            a._respond('gpt-6.1-sol','test')
+        self.assertEqual(fake.calls,[])
+    def test_user_plan_scope_but_missing_resource_scope_blocks_inference(self):
+        fake=Client();a=m.AuthEngine(Store(),8765,client=fake)
+        a.session={'access_token':'synthetic','expiry':time.time()+3600,
+                   'scope':'chatgpt.tokens.use.direct','client_id':'oaiapp_abc'}
+        with self.assertRaisesRegex(m.UserVisibleError,'利用枠の使用許可'):
+            a._respond('gpt-6.1-sol','test')
+        self.assertEqual(fake.calls,[])
+    def test_invalid_model_never_sends_photograph(self):
+        fake=Client();a=m.AuthEngine(Store(),8765,client=fake)
+        with self.assertRaisesRegex(m.UserVisibleError,'モデル'):
+            a.generate({'model':'@@not_a_model','image':'data:image/jpeg;base64,eA==','consent':True})
+        self.assertEqual(fake.calls,[])
+    def test_invalid_image_never_sends_photo(self):
+        fake=Client();a=m.AuthEngine(Store(),8765,client=fake)
+        with self.assertRaisesRegex(m.UserVisibleError,'写真'):
+            a.generate({'model':'gpt-6.1-sol','image':'https://remote.example/photo.jpg','consent':True})
+        self.assertEqual(fake.calls,[])
 if __name__=='__main__':unittest.main()
