@@ -73,7 +73,7 @@ test('repeated copy, edit during copy and navigation do not produce stale UI suc
 test('manual prompt toggle reopens current text; edits invalidate displayed prompt',()=>{
  const e=environment();e.mount();e.input('text-source',raw);e.get('text-show-prompt').onclick();assert.equal(e.get('text-prompt-panel').hidden,false);e.get('text-show-prompt').onclick();assert.equal(e.get('text-prompt-panel').hidden,true);e.input('text-source',raw+'更新');e.get('text-show-prompt').onclick();assert.equal(e.get('text-prompt').value,T.prompt(raw+'更新','合成試験'));
 });
-test('app routes text entry into the existing validated importer and preserves both drafts on return',()=>{
+test('app routes text entry into the existing validated importer and preserves both drafts on return',{skip:'Raw-text entry retired; topic and JSON draft preservation tested in quiz-integration'},()=>{
  const {app}=require('./test-support.cjs'),e=app();
  // Load the DOM-bound module in the same realm as the app's fake document.
  e.context.sessionStorage=storage();vm.runInContext(fs.readFileSync(__dirname+'/text-entry.js','utf8'),e.context);
@@ -85,7 +85,7 @@ test('app routes text entry into the existing validated importer and preserves b
  e.get('text-import-response').onclick();assert.equal(e.get('original-text').value,json(8));
  e.api.navigate('text');e.get('text-source').value=json(168);e.get('text-source').input();e.get('text-import-detected').onclick();assert.equal(e.get('original-text').value,json(168));assert.match(e.get('original-feedback').textContent,/168問/);
 });
-test('new text module is included before app startup and available to the service worker',()=>{
+test('topic module is included before app startup and available to the service worker',()=>{
  const html=fs.readFileSync(__dirname+'/index.html','utf8'),sw=fs.readFileSync(__dirname+'/sw.js','utf8');
- assert.ok(html.indexOf('./text-entry.js?')<html.indexOf('./app.js?'));assert.match(html,/text-entry\.css/);assert.match(sw,/'\.\/text-entry\.js'/);assert.match(sw,/'\.\/text-entry\.css'/);
+ assert.ok(html.indexOf('./topic-entry.js?')>=0);assert.ok(html.indexOf('./topic-entry.js?')<html.indexOf('./app.js?'));assert.match(html,/topic-entry\.css/);assert.match(sw,/'\.\/topic-entry\.js'/);assert.match(sw,/'\.\/topic-entry\.css'/);
 });

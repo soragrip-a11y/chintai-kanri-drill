@@ -1,18 +1,11 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const {app,image,q,record}=require('./test-support.cjs');
-test('capture removes title/topic and saves once then opens handoff directly',async()=>{
- const saved=[],{api,get,frames,context}=app([],async r=>saved.push(r));api.capture();
- assert.match(frames.at(-1),/元問題を追加/);assert.doesNotMatch(frames.at(-1),/source-title|source-topic|次の武器|どうやって/);
- await get('save-source').onclick();assert.equal(saved.length,0);
- api.setPhoto(image);get('exam').value='その他';await get('save-source').onclick();assert.equal(saved.length,0);
- get('custom-exam').value='独自資格';await get('save-source').onclick();assert.equal(saved.length,1);assert.equal(saved[0].exam,'独自資格');assert.equal(saved[0].image,image);assert.equal(saved[0].topic,'');assert.match(frames.at(-1),/batch-flow/);assert.equal(context.location.hash,'#detail/'+saved[0].id);
-});
-test('photo-only delete and undo preserve complete question history and metadata',async()=>{
- const r=structuredClone(record),{api}=app([r]);await api.changePhoto('set');const deleted=api.getRecords()[0];assert.equal(deleted.image,null);assert.deepEqual(JSON.parse(JSON.stringify(deleted.questions)),r.questions);assert.equal(deleted.topic,r.topic);assert.equal(deleted.title,r.title);assert.equal(api.getUndo().get('set'),image);
- await api.changePhoto('set',true);assert.equal(api.getRecords()[0].image,image);assert.equal(api.getUndo().size,0);
-});
-test('failed photo delete does not mutate stored or undo state',async()=>{
- const r=structuredClone(record),{api}=app([r],async()=>{throw Error('quota')});await api.changePhoto('set');assert.equal(api.getRecords()[0].image,image);assert.equal(api.getUndo().size,0);
+// Photo capture, photo deletion/undo and manual creation controls were retired.
+// Legacy photo records must remain readable and unchanged in the simplified UI.
+test('legacy photos and question history survive library and detail rendering',()=>{
+ const r=structuredClone(record),before=structuredClone(r),{api,frames}=app([r]);
+ api.library();api.detail(r.id);assert.deepEqual(api.getRecords(),[before]);
+ assert.doesNotMatch(frames.at(-1),/photo-files|save-source|manual-statement|delete-photo|restore-photo/);
 });
 test('library paginates and escapes untrusted titles',()=>{
  const rs=Array.from({length:5},(_,i)=>({...record,id:'s'+i,title:'<img src=x> '+i})),{api,get,frames}=app(rs);api.library();assert.equal((frames.at(-1).match(/<article/g)||[]).length,2);assert.match(frames.at(-1),/&lt;img/);assert.match(frames.at(-1),/1 \/ 3/);get('page-next').onclick();assert.match(frames.at(-1),/2 \/ 3/);get('page-next').onclick();assert.equal((frames.at(-1).match(/<article/g)||[]).length,1);

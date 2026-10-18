@@ -47,6 +47,6 @@ test('late start and resume do not override navigation while storage is pending'
  const r=row(),e=app([r]);let release;e.api.setSaveQuiz(async s=>{await new Promise(r=>release=r);return s});const starting=e.api.startQuiz([r]);while(!release)await Promise.resolve();e.api.navigate('library');release();await starting;assert.equal(e.context.location.hash,'#library');assert.equal(e.api.getSessions().length,1);
  const resuming=e.api.resumeQuiz(e.api.getSessions()[0].id);release=null;while(!release)await Promise.resolve();e.api.navigate('home');release();await resuming;assert.equal(e.context.location.hash,'#home');
 });
-test('source cards and details label saved per-set progress, JSON/photo additions remain available',async()=>{
- const e=setup();await e.api.answer(true);e.api.navigate('library');assert.match(e.frames.at(-1),/続きから（1 \/ 3問）/);e.api.navigate('detail','set');assert.match(e.frames.at(-1),/続きから（1 \/ 3問）/);e.api.navigate('capture');assert.match(e.frames.at(-1),/文章から問題を追加/);assert.match(e.frames.at(-1),/元の問題をそのまま取り込む（JSON）/);assert.match(e.frames.at(-1),/写真を撮る/);
+test('source cards and details label saved per-set progress without photo/manual controls',async()=>{
+ const e=setup();await e.api.answer(true);e.api.navigate('library');assert.match(e.frames.at(-1),/続きから（1 \/ 3問）/);e.api.navigate('detail','set');assert.match(e.frames.at(-1),/続きから（1 \/ 3問）/);assert.doesNotMatch(e.frames.at(-1),/photo-files|manual-statement|save-source/);
 });

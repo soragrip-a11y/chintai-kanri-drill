@@ -10,7 +10,7 @@
   if(!object(value)||!Array.isArray(value.questions)||!value.questions.length||value.questions.length>MAX_QUESTIONS)throw Error('原文のquestionsには1〜'+MAX_QUESTIONS+'問を指定してください');
   if(value.format!==undefined&&value.format!=='loopq.original.v1')throw Error('原文JSONのバージョンが未対応です');
   const rootKeys=['format','title','exam','sourceFile','sourceSha256','notice','questions'];
-  if(Object.keys(value).some(k=>!rootKeys.includes(k)))throw Error('原文JSONの項目を確認してください。写真から類題3問を作る回答は、類題の画面で保存してください');
+  if(Object.keys(value).some(k=>!rootKeys.includes(k)))throw Error('JSONの項目を確認してください。対応形式はloopq.original.v1です。「問題を作る」の指示文を使い、sourceIdやsetsを含めずquestionsに問題を入れてください');
   const seen=new Set(),keys=['originalId','topic','statement','answer','explanation','reference','trap','sourcePage','answerPage'];
   const questions=value.questions.map((q,i)=>{
    if(!object(q)||Object.keys(q).some(k=>!keys.includes(k)))throw Error((i+1)+'問目：対応する形式は○×問題です。選択肢問題や未知の項目はそのまま取り込めません');
