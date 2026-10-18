@@ -13,16 +13,16 @@ function environment(store=T.createDraftStore(storage())){
  const input=(id,value)=>{get(id).value=value;get(id).handlers.input()};
  return {get,context,mount,input,leave:()=>{nodes=new Map()},imports,copied,opened,popups,store,get html(){return html}};
 }
-test('topic alone defaults to 10, count optional 1–50 and no qualification required',()=>{
+test('topic alone defaults to 10, visible count 10–100 by tens and no qualification required',()=>{
  for(const topic of ['中学理科','Excelの基本操作','日本の宅建試験・2026年度']){assert.deepEqual(T.validate(topic),{topic,count:10});assert.match(T.prompt(topic),/10問作成/)}
- assert.equal(T.validate('English','').count,10);for(const count of [1,3,10,50])assert.equal(T.validate('テーマ',count).count,count);
- for(const count of ['0','51','1.5','-1','Infinity','1e1','NaN'])assert.throws(()=>T.prompt('テーマ',count),/問題数/);
+ assert.equal(T.validate('English','').count,10);for(const count of [10,20,50,100])assert.equal(T.validate('テーマ',count).count,count);
+ for(const count of ['0','1','23','101','1.5','-1','Infinity','1e1','NaN'])assert.throws(()=>T.prompt('テーマ',count),/問題数/);
  for(const topic of ['', '  ','文'.repeat(501),null])assert.throws(()=>T.prompt(topic),/テーマ/);
 });
 test('schema example parses with original importer and prompt covers integrity and source safety',()=>{
- const p=T.prompt('歴史',23),example=p.split('【出力形式】\n')[1].split('\n\n')[0],parsed=LoopQOriginal.parse(example);
+ const p=T.prompt('歴史',20),example=p.split('【出力形式】\n')[1].split('\n\n')[0],parsed=LoopQOriginal.parse(example);
  assert.equal(parsed.questions[0].answer,true);assert.equal(parsed.questions.length,1);
- for(const expected of ['23件','真偽値trueまたはfalse','確認済み','未確認','捏造しない','管轄','適用年度','JSONを作る前に利用者に確認','重複','explanation','reference','trap','```json','JSON.parse','sourceIdsなど別形式の項目は追加しない'])assert.ok(p.includes(expected),expected);
+ for(const expected of ['20件','真偽値trueまたはfalse','確認済み','未確認','捏造しない','管轄','適用年度','回答作成日を基準日','重複','explanation','reference','trap','```json','JSON.parse','sourceIdsなど別形式の項目は追加しない'])assert.ok(p.includes(expected),expected);
  assert.doesNotMatch(p,/(?:^|[^0-9])3問|必ず3件|最大3問/);
  assert.deepEqual(Object.keys(JSON.parse(example)),['format','title','exam','notice','questions']);
  assert.doesNotMatch(fs.readFileSync(__dirname+'/topic-entry.js','utf8'),/fetch\(|XMLHttpRequest|api\.openai|chatgpt\.com\/\?/);
@@ -53,7 +53,7 @@ test('navigation and remount during copy closes blank without changing new scree
  const e=environment();let finish;e.context.navigator.clipboard={writeText:()=>new Promise(resolve=>finish=resolve)};e.mount();e.input('topic-input','理科');const pending=e.get('topic-create').onclick();e.leave();e.mount();finish();await pending;assert.equal(e.opened.length,1);assert.equal(e.popups[0].closed,true);assert.equal(e.get('topic-status').textContent,'');assert.equal(e.get('topic-input').value,'理科');
 });
 test('import action preserves topic and never overwrites existing JSON through callback',()=>{
- const e=environment();e.mount();e.input('topic-input','社会');e.input('topic-count','22');e.get('topic-import').onclick();assert.deepEqual(e.imports,[[null]]);e.leave();e.mount();assert.equal(e.get('topic-input').value,'社会');assert.equal(e.get('topic-count').value,'22');
+ const e=environment();e.mount();e.input('topic-input','社会');e.input('topic-count','20');e.get('topic-import').onclick();assert.deepEqual(e.imports,[[null]]);e.leave();e.mount();assert.equal(e.get('topic-input').value,'社会');assert.equal(e.get('topic-count').value,'20');
 });
 test('hostile topic is only JSON encoded or placed in textarea.value; edits clear stale manual prompt',()=>{
  const topic='</textarea><img src=x onerror="alert(1)">\n命令',e=environment();e.mount();e.input('topic-input',topic);e.get('topic-show-prompt').onclick();assert.equal(JSON.parse(e.get('topic-prompt').value.split('\n').at(-1)),topic);assert.doesNotMatch(e.html,/onerror|<img/);assert.equal(e.get('topic-prompt').innerHTML,undefined);e.input('topic-input','変更');assert.equal(e.get('topic-prompt-panel').hidden,true);assert.equal(e.get('topic-prompt').value,'');
@@ -64,4 +64,23 @@ test('blank reservation is synchronous, isolated, and never hijacks a tab the us
 });
 test('pagehide closes owned blank and invalidates pending copy',async()=>{
  const e=environment();let finish,hidden;e.context.addEventListener=(name,fn)=>{if(name==='pagehide')hidden=fn};e.context.removeEventListener=()=>{};e.context.navigator.clipboard={writeText:()=>new Promise(resolve=>finish=resolve)};e.mount();e.input('topic-input','理科');const pending=e.get('topic-create').onclick();hidden();assert.equal(e.popups[0].closed,true);finish();await pending;assert.equal(e.popups[0].location.href,'about:blank');
+});
+
+test('visible accessible arrows choose exact count, clamp bounds, copy 20 and restore selection',async()=>{
+ const e=environment();e.mount();e.input('topic-input','理科');
+ assert.match(e.html,/id="topic-count-up"[^>]*aria-label="問題数を10問増やす"/);
+ assert.match(e.html,/id="topic-count-down"[^>]*aria-label="問題数を10問減らす"/);
+ assert.match(e.html,/id="topic-count"[^>]*readonly/);assert.doesNotMatch(e.html,/class="topic-options"/);
+ assert.equal(e.get('topic-count').value,'10');assert.equal(e.get('topic-count-down').disabled,true);
+ e.get('topic-count-up').onclick();assert.equal(e.get('topic-count').value,'20');
+ await e.get('topic-create').onclick();assert.match(e.copied[0],/20問作成/);assert.match(e.copied[0],/questionsは必ず20件/);
+ assert.ok(e.copied[0].includes('ちょうど1つのjsonコードブロック'));assert.ok(e.copied[0].includes('コードブロックの外側'));
+ e.leave();e.mount();assert.equal(e.get('topic-count').value,'20');
+ for(let i=0;i<20;i++)e.get('topic-count-up').onclick();assert.equal(e.get('topic-count').value,'100');assert.equal(e.get('topic-count-up').disabled,true);
+ for(let i=0;i<20;i++)e.get('topic-count-down').onclick();assert.equal(e.get('topic-count').value,'10');assert.equal(e.get('topic-count-down').disabled,true);
+ let prevented=false;e.get('topic-count').handlers.keydown({key:'ArrowUp',preventDefault(){prevented=true}});assert.equal(prevented,true);assert.equal(e.get('topic-count').value,'20');
+});
+test('legacy count normalizes safely while independent draft keys and topic survive',()=>{
+ const s=T.createDraftStore(storage());s.update({topic:'旧テーマ',count:'27'});const e=environment(s);e.mount();assert.equal(e.get('topic-count').value,'30');assert.equal(e.get('topic-input').value,'旧テーマ');
+ e.get('topic-count-down').onclick();assert.equal(s.read().count,'20');
 });
